@@ -44,7 +44,7 @@ def init(restart=False):
                 for j in range(10):
                     main_container.content.controls[i*10+j].border = ft.border.all(2, mute_color)
                     main_container.content.controls[i*10+j].content.controls[0].bgcolor = mute_color
-
+    return board
 
 if __name__ == "__main__":
     def main(page: ft.Page):
