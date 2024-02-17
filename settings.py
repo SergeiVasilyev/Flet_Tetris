@@ -3,7 +3,6 @@ import flet as ft
 # Board
 board_width = 10
 board_height = 20
-board = []
 
 # Tetromino blocks
 box_width = 20
@@ -17,6 +16,8 @@ bright_color = ft.colors.BLACK
 page_padding = 0
 horizontal_offset = 4
 
+ROW_POSITION =- 1
+COL_POSITION = 4
 
 
 
