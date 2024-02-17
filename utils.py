@@ -1,62 +1,85 @@
 from functools import reduce
 from settings import *
-from initialization import background, init, generate_element
+from initialization import Initialization
 from tetrominoes import TETROMINOES, EL_Z
-
-board = init()
-main_container = background()
-tetramino = TETROMINOES[generate_element()]
-# tetramino = EL_Z
+from flet import Container, Stack
+import random
+import copy
 
 
-def draw(drawing):
-    global board, tetromino_blocks_positions, row_position, col_position, tetramino
-    tetromino_blocks_positions = []
-    print(tetramino)
-    for x, y in tetramino:
-        board[y+row_position][x+col_position] = 1 if drawing else 0
-        tetromino_blocks_positions.append([(y+row_position)*10+(x+col_position), y+row_position, x+col_position])
-    return board
 
-def vertical_collision():
-    global tetromino_blocks_positions
-    for i in tetromino_blocks_positions:
-        if i[1] >= 19:
+class Tetris:
+    def __init__(self, main_container, board, tetramino, row_position=-1, col_position=4):
+        self.main_container = main_container
+        self.board = board
+        self.tetramino = tetramino
+        self.tetromino_blocks_positions = []
+        self.row_position = self.__row_position = row_position
+        self.col_position = self.__col_position = col_position
+
+    # def init(self):
+    #     self.board = None
+    #     self.tetramino = None
+    #     self.main_container = None
+    #     self.tetromino_blocks_positions = []
+    #     self.reset_position()
+    #     self.refresh_tetromino()
+
+    def generate_element(self):
+        return random.choice([*TETROMINOES])
+    
+    def refresh_tetromino(self):
+        self.tetramino = TETROMINOES[self.generate_element()]
+        return self.tetramino
+
+    def reset_position(self):
+        self.row_position = self.__row_position
+        self.col_position = self.__col_position
+
+    def draw(self, drawing):
+        self.tetromino_blocks_positions = []
+        for x, y in self.tetramino:
+            self.board[y+self.row_position][x+self.col_position] = 1 if drawing else 0
+            self.tetromino_blocks_positions.append([(y+self.row_position)*10+(x+self.col_position), y+self.row_position, x+self.col_position])
+        return self.board # self
+
+    def vertical_collision(self):
+        for i in self.tetromino_blocks_positions:
+            if i[1] >= 19:
+                return True
+            elif self.board[i[1]+1][i[2]] == -1:
+                return True
+        return False
+
+    def mark_as_dropped(self):
+        for j in self.tetromino_blocks_positions:
+            self.board[j[1]][j[2]] = -1 # mark as dropped
+
+    def horizontal_collision(self, x):
+        for i in self.tetromino_blocks_positions:
+            if x + i[2] < 0 or x + i[2] > 9:
+                return True
+        return False
+
+    def element_length(self):
+        max_len = 0
+        res = reduce(lambda x, y: [x[i] or y[i] for i in range(len(x))], self.tetramino)
+        max_len = sum(res)
+        return max_len
+
+    def is_full(self):
+        if -1 in self.board[1]:
             return True
-        elif board[i[1]+1][i[2]] == -1:
-            return True
-    return False
+        return False
 
-def mark_as_dropped():
-    for j in tetromino_blocks_positions:
-        board[j[1]][j[2]] = -1 # mark as dropped
-
-def horizontal_collision(x):
-    for i in tetromino_blocks_positions:
-        if x + i[2] < 0 or x + i[2] > 9:
-            return True
-    return False
-
-def element_length(tetramino):
-    max_len = 0
-    res = reduce(lambda x, y: [x[i] or y[i] for i in range(len(x))], tetramino)
-    max_len = sum(res)
-    return max_len
-
-def is_full():
-    if -1 in board[1]:
-        return True
-    return False
-
-def path_correction(new_element):
-    global tetramino, col_position, row_position
-    for el in new_element:
-        if el[0] + col_position > 9:
-            col_position = 9 - el[0]
-        elif el[0] + col_position < 0:
-            col_position = 0 - el[0]
-        elif el[1] + row_position > 19:
-            row_position = 19 - el[1]
-        elif el[1] + row_position < 0:
-            row_position = 0 - el[1]
-    return new_element
+    def path_correction(self, check_element):
+        for el in check_element:
+            if el[0] + self.col_position > 9:
+                self.col_position = 9 - el[0]
+            elif el[0] + self.col_position < 0:
+                self.col_position = 0 - el[0]
+            elif el[1] + self.row_position > 19:
+                self.row_position = 19 - el[1]
+            elif el[1] + self.row_position < 0:
+                self.row_position = 0 - el[1]
+        return check_element
