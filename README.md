@@ -1,3 +1,7 @@
 # Flet Tetris game
 
-Tetris game on Flet Framwork
+Cross platform Tetris Game on Flet Framwork
+
+
+
+
