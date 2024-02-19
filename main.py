@@ -45,6 +45,9 @@ async def main(page: ft.Page):
             if -1 in board[i]:
                 if abs(sum(board[i])) == board_width:
                     remove_line(i)
+                    tetris.score += 1
+                    info.value = f'Score: {tetris.score}'
+                    await page.update_async()
                     await refresh_bord()
         return True
 
@@ -164,18 +167,22 @@ async def main(page: ft.Page):
            )
     container = ft.Container(
         content=buttons1,
+        # border=ft.border.all(1, ft.colors.BLACK),
     )
     container2 = ft.Container(
         content=buttons2,
+        # border=ft.border.all(1, ft.colors.BLACK),
     )
     container3 = ft.Container(
         content=buttons3,
+        # border=ft.border.all(1, ft.colors.BLACK),
     )
 
     column = ft.Column(
         [container, container2, container3],
         horizontal_alignment=ft.CrossAxisAlignment.START,
-        width=250,
+        width=240,
+        spacing=0
     )
 
     button4 = ft.Row(
@@ -190,24 +197,33 @@ async def main(page: ft.Page):
 
     row_main = ft.Row(
         [column, column4],
-        alignment=ft.MainAxisAlignment.SPACE_BETWEEN, 
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
     )
 
     col_main = ft.Column(
         [func_container, row_main],
         width=550,
-        spacing=20
+        spacing=10
     )
 
+    info = ft.Text(f"Score: {tetris.score}", size=20)
+    info_container = ft.Container(
+        content=info
+    )
+
+    tetris_row = ft.Row(
+        [main_container, info_container],
+        alignment=ft.MainAxisAlignment.CENTER
+    )
 
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = page_padding
     # page.window_width = main_cont_width + page_padding * 2
-    page.window_height = 920
+    page.window_height = 800
     page.window_width = 500
     page.bgcolor = ft.colors.BLUE_GREY_300
-    await page.add_async(main_container, col_main)
+    await page.add_async(tetris_row, col_main)
 
 ft.app(target=main)
 
