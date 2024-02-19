@@ -45,9 +45,8 @@ async def main(page: ft.Page):
             if -1 in board[i]:
                 if abs(sum(board[i])) == board_width:
                     remove_line(i)
+                    # print('board after remove', board, len(board))
                     tetris.score += 1
-                    info.value = 'Score: {}'.format(tetris.score) # Not working with f string
-                    await page.update_async()
                     await refresh_bord()
         return True
 
@@ -65,16 +64,16 @@ async def main(page: ft.Page):
         if tetris.vertical_collision():
             tetris.mark_as_dropped()
             await is_line_complete()
+            info.value = 'Score: {}'.format(tetris.score) # Not working with f string
             tetris.reset_position()
             tetris.refresh_tetromino()
         await page.update_async()
 
     async def game(e):
-        # print(start_btn.on_click)
-        while True:
-            await animate(None)
+        while e.control.selected:
+            await animate(e)
             await asyncio.sleep(1)
-            
+
             
     async def drop(e):
         while tetris.row_position != -1:
@@ -142,7 +141,8 @@ async def main(page: ft.Page):
     direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR)
     rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR)
 
-    start_btn = ft.ElevatedButton("S", on_click=game, data=True, style=func_btn_style)
+    start_btn = ft.Chip(label=ft.Text('Start'), on_select=game)
+    # start_btn = ft.ElevatedButton("S", on_click=game, style=func_btn_style, data=True)
     restart_btn = ft.ElevatedButton("R", on_click=restart, style=func_btn_style)
     func_buttons = ft.Row([start_btn, restart_btn], alignment=ft.MainAxisAlignment.END)
     func_container = ft.Container(
