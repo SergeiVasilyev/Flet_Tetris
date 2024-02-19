@@ -26,7 +26,7 @@ class Initialization:
         main_cont_height = (box_height + box_margin*2) * 20 + main_cont_padding * 2
 
         stack2 = Stack()
-        stack2.controls = [ContainerModified(width=10, height=10, bgcolor=mute_color, margin=box_margin, border_radius=box_border_radius)]
+        stack2.controls = [ContainerModified(width=10, height=10, bgcolor=mute_color, margin=3, border_radius=box_border_radius)]
 
         stack = Stack()
         self.main_container = ContainerModified(bgcolor="#afb582", content=stack, width=main_cont_width, height=main_cont_height, padding=box_margin)

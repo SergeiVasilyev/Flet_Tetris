@@ -7,7 +7,7 @@ board_height = 20
 # Tetromino blocks
 box_width = 20
 box_height = 20
-box_margin = 3
+box_margin = 1
 box_border_radius = 2
 mute_color = ft.colors.GREY_500
 bright_color = ft.colors.BLACK
