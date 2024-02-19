@@ -3,7 +3,7 @@ from functools import reduce
 import flet as ft
 from tetrominoes import TETROMINOES
 from settings import *
-from utils import Tetris
+from utils import Tetris, save_highscore
 from initialization import Initialization
 
 
@@ -46,7 +46,7 @@ async def main(page: ft.Page):
                 if abs(sum(board[i])) == board_width:
                     remove_line(i)
                     tetris.score += 1
-                    info.value = f'Score: {tetris.score}'
+                    info.value = 'Score: {}'.format(tetris.score) # Not working with f string
                     await page.update_async()
                     await refresh_bord()
         return True
@@ -57,6 +57,7 @@ async def main(page: ft.Page):
         tetris.row_position += 1
         draw_element(True)
         if tetris.is_full():
+            save_highscore(tetris.score)
             tetris.board = init.init(True)
             tetris.main_container = init.background()
             tetris.tetramino = TETROMINOES[init.generate_element()]

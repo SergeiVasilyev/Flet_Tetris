@@ -83,3 +83,8 @@ class Tetris:
             elif el[1] + self.row_position < 0:
                 self.row_position = 0 - el[1]
         return check_element
+    
+
+def save_highscore(score):
+    with open('highscore.txt', 'w') as f:
+        f.write(str(score))
