@@ -39,8 +39,12 @@ class Tetris:
     def draw(self, drawing):
         self.tetromino_blocks_positions = []
         for x, y in self.tetramino:
-            self.board[y+self.row_position][x+self.col_position] = 1 if drawing else 0
-            self.tetromino_blocks_positions.append([(y+self.row_position)*10+(x+self.col_position), y+self.row_position, x+self.col_position])
+            # print(x, y, self.row_position, self.col_position)
+            try:
+                self.board[y+self.row_position][x+self.col_position] = 1 if drawing else 0
+                self.tetromino_blocks_positions.append([(y+self.row_position)*10+(x+self.col_position), y+self.row_position, x+self.col_position])
+            except:
+                print('error', self.board, x, y, self.row_position, self.col_position)
         return self.board # self
 
     def vertical_collision(self):
