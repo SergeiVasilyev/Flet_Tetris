@@ -7,14 +7,12 @@ Cross platform Tetris Game on Flet Framwork
 
 ## TODO
 
-- Fix horisontal collision
-- Background color
-- Buttons styling
 - Score, Save hi-score
 - Levels
 - Speed
 - Next tetromino
 - Pause
+- Background color
 - Save game
 - Options (Color, Clockwise)
 - FIX Button on_long_press
