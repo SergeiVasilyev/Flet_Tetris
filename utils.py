@@ -55,9 +55,9 @@ class Tetris:
         for j in self.tetromino_blocks_positions:
             self.board[j[1]][j[2]] = -1 # mark as dropped
 
-    def horizontal_collision(self, x):
+    def horizontal_collision(self, x): # 1 - right, -1 - left
         for i in self.tetromino_blocks_positions:
-            if x + i[2] < 0 or x + i[2] > 9:
+            if x + i[2] < 0 or x + i[2] > 9 or self.board[i[1]][x+i[2]] == -1:
                 return True
         return False
 
