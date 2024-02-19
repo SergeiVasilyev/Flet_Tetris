@@ -66,7 +66,7 @@ async def main(page: ft.Page):
         await page.update_async()
 
     async def game(e):
-        print(button.on_click)
+        # print(start_btn.on_click)
         while True:
             await animate(None)
             await asyncio.sleep(1)
@@ -115,11 +115,11 @@ async def main(page: ft.Page):
         while not tetris.horizontal_collision(1):
             await right(e)
 
-    async def down(e):
-        print(e.control.bgcolor, e.data)
-        print('down')
-        e.control.bgcolor = "blue" if e.data == "true" else "yellow"
-        await e.control.update_async()
+    # async def down(e):
+    #     print(e.control.bgcolor, e.data)
+    #     print('down')
+    #     e.control.bgcolor = "blue" if e.data == "true" else "yellow"
+    #     await e.control.update_async()
         # e.control.update()
         # while tetris.row_position != -1:
         #     await animate(e)
@@ -129,38 +129,85 @@ async def main(page: ft.Page):
         print('down')
         e.control.bgcolor = "blue" if e.data == "true" else "yellow"
         await e.control.update_async()
+
+    func_btn_style = ft.ButtonStyle(
+        shape=ft.CircleBorder(),
+        padding=ft.padding.all(10),
+    )
         
+    direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR)
+    rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR)
 
-    button = ft.ElevatedButton("START", on_click=game, data=True)
-    drop_btn = ft.ElevatedButton("Drop", on_click=drop)
-    restart_btn = ft.ElevatedButton("Restart", on_click=restart)
-    rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate)
-    left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long)
-    right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long)
-    down_btn = ft.ElevatedButton("Down", bgcolor="yellow", on_long_press=on_click)
+    start_btn = ft.ElevatedButton("S", on_click=game, data=True, style=func_btn_style)
+    restart_btn = ft.ElevatedButton("R", on_click=restart, style=func_btn_style)
+    func_buttons = ft.Row([start_btn, restart_btn], alignment=ft.MainAxisAlignment.END)
+    func_container = ft.Container(
+        content=func_buttons,
+    )
 
-    buttons = ft.Row([
-        button,
-        restart_btn,
-    ],
-    alignment=ft.MainAxisAlignment.CENTER)
+    rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
 
-    buttons2 = ft.Row([
-        left_btn,
-        right_btn,
-        drop_btn,
-        rotate_btn,
-        down_btn
-    ],
-    alignment=ft.MainAxisAlignment.CENTER)
+    left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long, style=direction_btn_style)
+    right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long, style=direction_btn_style)
+    up_btn = ft.ElevatedButton("Up", on_click=drop, style=direction_btn_style)
+    drop_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
+    down_btn = ft.ElevatedButton("Down", on_click=drop, style=direction_btn_style)
+
+    buttons1 = ft.Row([up_btn], 
+           alignment=ft.MainAxisAlignment.CENTER
+           )
+    buttons2 = ft.Row([left_btn, right_btn], 
+           alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+           )
+    buttons3 = ft.Row([drop_btn], 
+           alignment=ft.MainAxisAlignment.CENTER
+           )
+    container = ft.Container(
+        content=buttons1,
+    )
+    container2 = ft.Container(
+        content=buttons2,
+    )
+    container3 = ft.Container(
+        content=buttons3,
+    )
+
+    column = ft.Column(
+        [container, container2, container3],
+        horizontal_alignment=ft.CrossAxisAlignment.START,
+        width=250,
+    )
+
+    button4 = ft.Row(
+        [rotate_btn],
+    )
+    container4 = ft.Container(
+        content=button4,
+    )
+    column4 = ft.Column(
+        [container4],
+    )
+
+    row_main = ft.Row(
+        [column, column4],
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN, 
+    )
+
+    col_main = ft.Column(
+        [func_container, row_main],
+        width=550,
+        spacing=20
+    )
+
 
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = page_padding
     # page.window_width = main_cont_width + page_padding * 2
-    page.window_height = 800
+    page.window_height = 920
+    page.window_width = 500
     page.bgcolor = ft.colors.BLUE_GREY_300
-    await page.add_async(main_container, buttons, buttons2)
+    await page.add_async(main_container, col_main)
 
 ft.app(target=main)
 

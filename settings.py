@@ -13,11 +13,14 @@ mute_color = ft.colors.GREY_500
 bright_color = ft.colors.BLACK
 
 # Game init settings
-page_padding = 0
+page_padding = 5
 horizontal_offset = 4
 
 ROW_POSITION =- 1
 COL_POSITION = 4
+
+# BUTTONS STYLE
+BTN_COLOR = ft.colors.YELLOW_600
 
 
 
