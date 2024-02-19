@@ -2,9 +2,8 @@ from functools import reduce
 from settings import *
 from initialization import Initialization
 from tetrominoes import TETROMINOES, EL_Z
-from flet import Container, Stack
 import random
-import copy
+
 
 
 
@@ -16,6 +15,7 @@ class Tetris:
         self.tetromino_blocks_positions = []
         self.row_position = self.__row_position = row_position
         self.col_position = self.__col_position = col_position
+        self.score = 0
 
     # def init(self):
     #     self.board = None
