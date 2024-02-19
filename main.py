@@ -107,20 +107,37 @@ async def main(page: ft.Page):
             draw_element(True)
             await page.update_async()
     
+    async def left_long(e):
+        while not tetris.horizontal_collision(-1):
+            await left(e)
 
-    # async def test(e):
-    #     global data_test
-    #     print(test_btn.data)
-    #     test_btn.data = not test_btn.data
+    async def right_long(e):
+        while not tetris.horizontal_collision(1):
+            await right(e)
+
+    async def down(e):
+        print(e.control.bgcolor, e.data)
+        print('down')
+        e.control.bgcolor = "blue" if e.data == "true" else "yellow"
+        await e.control.update_async()
+        # e.control.update()
+        # while tetris.row_position != -1:
+        #     await animate(e)
+
+    async def on_click(e: ft.LongPressEndEvent):
+        print(e.control, e.data)
+        print('down')
+        e.control.bgcolor = "blue" if e.data == "true" else "yellow"
+        await e.control.update_async()
         
 
     button = ft.ElevatedButton("START", on_click=game, data=True)
     drop_btn = ft.ElevatedButton("Drop", on_click=drop)
     restart_btn = ft.ElevatedButton("Restart", on_click=restart)
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate)
-    left_btn = ft.ElevatedButton("Left", on_click=left) # on_long_press
-    right_btn = ft.ElevatedButton("Right", on_click=right)
-    # test_btn = ft.ElevatedButton("TEST", on_click=test, data=True)
+    left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long)
+    right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long)
+    down_btn = ft.ElevatedButton("Down", bgcolor="yellow", on_long_press=on_click)
 
     buttons = ft.Row([
         button,
@@ -133,7 +150,7 @@ async def main(page: ft.Page):
         right_btn,
         drop_btn,
         rotate_btn,
-        # test_btn
+        down_btn
     ],
     alignment=ft.MainAxisAlignment.CENTER)
 
