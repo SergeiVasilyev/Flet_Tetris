@@ -11,7 +11,6 @@ Cross platform Tetris Game on Flet Framwork
 - Levels
 - Speed
 - Next tetromino
-- Pause
 - Background color
 - Save game
 - Options (Color, Clockwise)
