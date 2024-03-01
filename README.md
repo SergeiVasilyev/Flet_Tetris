@@ -2,15 +2,13 @@
 
 Cross platform Tetris Game on Flet Framwork
 
-![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_03.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_04.png "Text to show on mouseover")
 
 
 ## TODO
 
-- Score, Save hi-score
-- Levels
-- Speed
-- Next tetromino
+- Save hi-score
+- Show Next tetromino
 - Background color
 - Save game
 - Options (Color, Clockwise)
