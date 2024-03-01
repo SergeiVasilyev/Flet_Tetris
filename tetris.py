@@ -67,7 +67,7 @@ class Game:
         self.score = 0
         self.level = 0
         self.delay = 1
-        self.showed_speed = 0
+        self.speed = 0
         self.hiscore = self.read_hiscore()
 
     def inits(self):
@@ -79,7 +79,7 @@ class Game:
         self.score = 0
         self.level = 0
         self.delay = 1
-        self.showed_speed = 0
+        self.speed = 0
     
 
     def read_hiscore(self):
@@ -178,8 +178,8 @@ class Game:
         self.lines += lines
         self.score += 100 * lines**2 + (self.level * 100)
         self.level = int(self.lines / 10)
-        self.delay = 1.0 - int(self.lines / 20) * 0.1
-        self.showed_speed = int(self.lines / 20)
+        self.delay = 1.0 - self.lines // 20 * 0.1
+        self.speed = self.lines // 20
 
 
 if __name__ == "__main__":

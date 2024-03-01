@@ -11,13 +11,14 @@ lines = ft.Text(f"Lines: 0", size=20)
 score = ft.Text(f"Score: 0", size=20)
 level = ft.Text(f"Level: 0", size=20)
 delay = ft.Text(f"Delay: 0", size=20)
-showed_speed = ft.Text(f"Speed: 1", size=20)
+speed = ft.Text(f"Speed: 1", size=20)
 
 async def main(page: ft.Page):
     ms = MainScreen()
     main_screen = ms.background()
     main_container = main_screen.controls[0].content
     tetris = Game()
+    hiscore.value = f"Hiscore: {tetris.hiscore}"
     
     
     def reset_screen(refresh=False):
@@ -42,7 +43,7 @@ async def main(page: ft.Page):
         level.value = f"Level: {tetris.level}"
         score.value = f"Score: {tetris.score}"
         delay.value = f"Delay: {tetris.delay}"
-        showed_speed.value = f"Speed: {tetris.showed_speed}"
+        speed.value = f"Speed: {tetris.speed}"
 
 
     async def set_dropped(wait=0.5):
@@ -131,7 +132,7 @@ async def main(page: ft.Page):
 
     # Info screen
     info_container = ft.Container(
-        content=ft.Column([hiscore, lines, score, level, delay, showed_speed]),
+        content=ft.Column([hiscore, lines, score, level, delay, speed]),
         alignment=ft.alignment.center
     )
     main_screen.controls[1].content = info_container
