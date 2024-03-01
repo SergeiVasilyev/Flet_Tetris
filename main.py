@@ -113,12 +113,12 @@ async def main(page: ft.Page):
 
 
     # Buttons style
-    func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(10))
-    direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR)
-    rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR)
+    func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(10), color="black", bgcolor="white", shadow_color="black", elevation=3)
+    direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
+    rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
 
     # Buttons
-    start_btn = ft.Chip(label=ft.Text('Start'), on_select=game)
+    start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", )
     restart_btn = ft.ElevatedButton("R", on_click=restart, style=func_btn_style)
     func_buttons = [start_btn, restart_btn]
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
@@ -137,10 +137,20 @@ async def main(page: ft.Page):
     )
     main_screen.controls[1].content = info_container
 
+    main_screen_container = ft.Container(
+        content=main_screen,
+        border=ft.border.only(
+            bottom=ft.border.BorderSide(4, ft.colors.BLACK12), 
+            right=ft.border.BorderSide(4, ft.colors.BLACK12), 
+            left=ft.border.BorderSide(4, ft.colors.BLACK38), 
+            top=ft.border.BorderSide(4, ft.colors.BLACK38)),
+        border_radius=20,
+    )
+
     # Main screen
     tetris_row = ft.Row(
-        [main_screen],
-        alignment=ft.MainAxisAlignment.CENTER
+        [main_screen_container],
+        alignment=ft.MainAxisAlignment.CENTER,
     )
 
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -148,7 +158,8 @@ async def main(page: ft.Page):
     page.padding = page_padding
     page.window_height = 800
     page.window_width = 500
-    page.bgcolor = ft.colors.BLUE_GREY_300
+    # page.bgcolor = ft.colors.BLUE_GREY_300
+    page.bgcolor = "#2980B9"
     await page.add_async(tetris_row, buttons_block)
 
 ft.app(target=main)

@@ -18,7 +18,8 @@ class MainScreen():
             ft.Container(main_container, width=main_cont_width, padding=main_cont_padding, bgcolor="#afb582"), 
             sidebar],
             alignment=ft.MainAxisAlignment.CENTER,
-            spacing=0
+            spacing=0,
+            
         )
         
         stack2 = ft.Stack()
