@@ -41,7 +41,7 @@ class Tetromino:
     
 
 class TetrominoGenerator:
-    def __init__(self, cart=['Z', 'S']):
+    def __init__(self, cart=[]):
         self.cart = self.generate_cart() if not cart else cart
 
     def generate_cart(self):
