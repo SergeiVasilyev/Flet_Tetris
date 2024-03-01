@@ -1,16 +1,18 @@
 import flet as ft
 
 # Board
-board_width = 10
-board_height = 20
+BOARD_WIDTH = 10
+BOARD_HEIGHT = 20
 
 # Tetromino blocks
-box_width = 20
-box_height = 20
-box_margin = 1
-box_border_radius = 2
-mute_color = ft.colors.GREY_500
-bright_color = ft.colors.BLACK
+BOX_WIDTH = 20
+BOX_HEIGHT = 20
+INNER_BOX_WIDTH = 9
+INNER_BOX_HEIGHT = 9
+BOX_MARGIN = 1
+BOX_BORDER_RADIUS = 2
+MUTE_COLOR = ft.colors.GREY_500
+BRIGHT_COLOR = ft.colors.BLACK
 
 # Game init settings
 page_padding = 5
