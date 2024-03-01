@@ -3,6 +3,7 @@ import random
 from tetrominoes import TETROMINOES, EL_T, EL_L, EL_J, EL_O, EL_I, EL_S, EL_Z
 from settings import *
 import time
+from data_rw import read_score, save_score
 
 
 class Block:
@@ -67,6 +68,7 @@ class Game:
         self.level = 0
         self.delay = 1
         self.showed_speed = 0
+        self.hiscore = self.read_hiscore()
 
     def inits(self):
         self.status = Status.RUNNING
@@ -79,6 +81,13 @@ class Game:
         self.delay = 1
         self.showed_speed = 0
     
+
+    def read_hiscore(self):
+        obj = read_score()
+        if obj:
+            return obj['score']
+        return 0
+
 
     def running(self):
         if not self.current_tetromino:
@@ -153,6 +162,10 @@ class Game:
             self.board[block.y][block.x] = 1
         self.score += 10
         self.clear_full_lines()
+        if self.score > self.hiscore:
+            save_score('Tetris', self.score)
+        self.hiscore = self.read_hiscore()
+        
 
     def clear_full_lines(self):
         lines = 0

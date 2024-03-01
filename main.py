@@ -6,6 +6,7 @@ from main_screen import MainScreen
 from tetris import Game
 
 
+hiscore = ft.Text(f"Hiscore: 0", size=20)
 lines = ft.Text(f"Lines: 0", size=20)
 score = ft.Text(f"Score: 0", size=20)
 level = ft.Text(f"Level: 0", size=20)
@@ -35,7 +36,8 @@ async def main(page: ft.Page):
                 main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
     def update_dashboard():
-        global lines, level, score, delay
+        global lines, level, score, delay, hiscore
+        hiscore.value = f"Hiscore: {tetris.hiscore}"
         lines.value = f"Lines: {tetris.lines}"
         level.value = f"Level: {tetris.level}"
         score.value = f"Score: {tetris.score}"
@@ -129,7 +131,7 @@ async def main(page: ft.Page):
 
     # Info screen
     info_container = ft.Container(
-        content=ft.Column([lines, score, level, delay, showed_speed]),
+        content=ft.Column([hiscore, lines, score, level, delay, showed_speed]),
         alignment=ft.alignment.center
     )
     main_screen.controls[1].content = info_container
