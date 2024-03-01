@@ -7,10 +7,12 @@ Cross platform Tetris Game on Flet Framwork
 
 ## TODO
 
+- Game oveer
 - Save hi-score
 - Show Next tetromino
 - Background color
 - Save game
 - Options (Color, Clockwise)
-- FIX Button on_long_press
+- Find implementation for long press button
+- Design
 
