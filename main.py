@@ -10,7 +10,7 @@ lines = ft.Text(f"Lines: 0", size=20)
 score = ft.Text(f"Score: 0", size=20)
 level = ft.Text(f"Level: 0", size=20)
 delay = ft.Text(f"Delay: 0", size=20)
-showed_speed = ft.Text(f"Showed: 1", size=20)
+showed_speed = ft.Text(f"Speed: 1", size=20)
 
 async def main(page: ft.Page):
     ms = MainScreen()
@@ -40,7 +40,7 @@ async def main(page: ft.Page):
         level.value = f"Level: {tetris.level}"
         score.value = f"Score: {tetris.score}"
         delay.value = f"Delay: {tetris.delay}"
-        showed_speed.value = f"Showed: {tetris.showed_speed}"
+        showed_speed.value = f"Speed: {tetris.showed_speed}"
 
 
     async def set_dropped(wait=0.5):
