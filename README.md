@@ -2,15 +2,14 @@
 
 An attempt to implement a portable Tetris game from the 90s using cross platform Flet framework
 
-![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_04m.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_05.png "Text to show on mouseover")
 
 
 ## TODO
 
 - Game oveer
-- Save hi-score
+- Reset
 - Show Next tetromino
-- Background color
 - Save game
 - Options (Color, Clockwise)
 - Find implementation for long press button
