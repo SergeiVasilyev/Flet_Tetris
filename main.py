@@ -6,19 +6,26 @@ from main_screen import MainScreen
 from tetris import Game
 
 
-hiscore = ft.Text(f"Hiscore: 0", size=20)
-lines = ft.Text(f"Lines: 0", size=20)
-score = ft.Text(f"Score: 0", size=20)
-level = ft.Text(f"Level: 0", size=20)
-delay = ft.Text(f"Delay: 0", size=20)
-speed = ft.Text(f"Speed: 1", size=20)
+lcd_font = "LCD"
+hiscore_label = ft.Text(f"HI-SCORE", size=15)
+hiscore = ft.Text(f"0", size=20, font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+lines = ft.Text(f"Lines: 0", size=20, font_family=lcd_font)
+score_lable = ft.Text(f"SCORE", size=15)
+score = ft.Text(f"0", size=20, font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+level_lable = ft.Text(f"LEVEL", size=15)
+level = ft.Text(f"1", size=20, font_family=lcd_font)
+delay = ft.Text(f"Delay: 0", size=20, font_family=lcd_font)
+speed_lable = ft.Text(f"SPEED", size=15)
+speed = ft.Text(f"1", size=20, font_family=lcd_font)
+next_label = ft.Text(f"NEXT", size=15)
 
 async def main(page: ft.Page):
     ms = MainScreen()
     main_screen = ms.background()
+    next_viewer = ms.next_tetromino_viewer()
     main_container = main_screen.controls[0].content
     tetris = Game()
-    hiscore.value = f"Hiscore: {tetris.hiscore}"
+    hiscore.value = f"{tetris.hiscore}"
     
     
     def reset_screen(refresh=False):
@@ -36,28 +43,40 @@ async def main(page: ft.Page):
                 main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
+    def next_view(is_show, tetris):
+        t = tetris.next_tetromino
+        if t:
+            for block in t.shape():
+                next_viewer.content.controls[block.y * 4 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
+                next_viewer.content.controls[block.y * 4 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
+
     def update_dashboard():
-        global lines, level, score, delay, hiscore
-        hiscore.value = f"Hiscore: {tetris.hiscore}"
+        global lines, level, score, delay, hiscore_label, hiscore
+        hiscore.value = f"{tetris.hiscore}"
         lines.value = f"Lines: {tetris.lines}"
-        level.value = f"Level: {tetris.level}"
-        score.value = f"Score: {tetris.score}"
+        level.value = f"{tetris.level}"
+        score.value = f"{tetris.score}"
         delay.value = f"Delay: {tetris.delay}"
-        speed.value = f"Speed: {tetris.speed}"
+        speed.value = f"{tetris.speed}"
 
 
     async def set_dropped(wait=0.5):
         if tetris.collision(row=1): 
             await asyncio.sleep(wait) # last chance to move tetromino
             if tetris.collision(row=1): # check again if tetromino can move
+                next_view(False, tetris)
                 tetris.dropped()
                 tetris.new_tetromino()
             reset_screen(True) # refresh board. On last step, dropped tetromino leaves trace.
             update_dashboard()
+            next_view(True, tetris)
+            
+            
 
     async def game(e):
         if tetris.status != 1:
             tetris.inits()
+            next_view(True, tetris)
         while e.control.selected:
             await down(delay=tetris.delay)
 
@@ -132,7 +151,8 @@ async def main(page: ft.Page):
 
     # Info screen
     info_container = ft.Container(
-        content=ft.Column([hiscore, lines, score, level, delay, speed]),
+        content=ft.Column([hiscore_label, hiscore, score_lable, score, level_lable, level, speed_lable, speed, next_label, next_viewer], 
+                          horizontal_alignment=ft.CrossAxisAlignment.END),
         alignment=ft.alignment.center
     )
     main_screen.controls[1].content = info_container
@@ -158,7 +178,7 @@ async def main(page: ft.Page):
     page.padding = page_padding
     page.window_height = 800
     page.window_width = 500
-    # page.bgcolor = ft.colors.BLUE_GREY_300
+    page.fonts = {"LCD": "fonts/LCD.ttf"}
     page.bgcolor = "#2980B9"
     await page.add_async(tetris_row, buttons_block)
 
