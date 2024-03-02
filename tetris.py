@@ -53,6 +53,9 @@ class TetrominoGenerator:
         next = self.cart.pop(0)
         self.cart += self.generate_cart()
         return Tetromino(next)
+    
+    def get_next_tetromino(self):
+        return Tetromino(self.cart[0])
 
 class Status:
     INIT = 0
@@ -67,7 +70,7 @@ class Game:
         self.score = 0
         self.level = 0
         self.delay = 1
-        self.speed = 0
+        self.speed = 1
         self.hiscore = self.read_hiscore()
 
     def inits(self):
@@ -75,11 +78,12 @@ class Game:
         self.tetromino_generator = TetrominoGenerator()
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+        self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         self.lines = 0
         self.score = 0
         self.level = 0
         self.delay = 1
-        self.speed = 0
+        self.speed = 1
     
 
     def read_hiscore(self):
@@ -92,6 +96,7 @@ class Game:
     def running(self):
         if not self.current_tetromino:
             self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+            self.next_tetromino = self.tetromino_generator.get_next_tetromino()
             self.current_tetromino.row = -1
         if self.current_tetromino:
             self.down()
@@ -99,6 +104,7 @@ class Game:
     def new_tetromino(self):
         self.current_tetromino.row = -1
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+        self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         
     def left(self):
         if not self.collision(col=-1):
@@ -177,9 +183,9 @@ class Game:
                               
         self.lines += lines
         self.score += 100 * lines**2 + (self.level * 100)
-        self.level = int(self.lines / 10)
+        self.level = 1 + self.lines // 10
         self.delay = 1.0 - self.lines // 20 * 0.1
-        self.speed = self.lines // 20
+        self.speed = 1 + self.lines // 20
 
 
 if __name__ == "__main__":
