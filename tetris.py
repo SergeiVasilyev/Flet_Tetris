@@ -128,7 +128,7 @@ class Game:
                 return True
             elif block.x+col < 0 or block.x+col >= BOARD_WIDTH:
                 return True
-            elif self.board[block.y+row][block.x+col] == 1:
+            elif block.is_block_inside_board() and self.board[block.y+row][block.x+col] == 1: # Have to check if block is inside board first
                 return True
         return False
     
