@@ -67,18 +67,29 @@ async def main(page: ft.Page):
                 next_view(False, tetris)
                 tetris.dropped()
                 tetris.new_tetromino()
-            reset_screen(True) # refresh board. On last step, dropped tetromino leaves trace.
+            reset_screen(True)
             update_dashboard()
             next_view(True, tetris)
             
             
 
     async def game(e):
-        if tetris.status != 1:
-            tetris.inits()
-            next_view(True, tetris)
         while e.control.selected:
+            if tetris.status == 2:
+                reset_screen()
+                start_btn.selected = False
+                await page.update_async()
+                tetris.status == 0
+                break
+            if tetris.status == 0:
+                if tetris.next_tetromino:
+                    next_view(False, tetris)
+                tetris.inits()
+                reset_screen()
+                update_dashboard()
+                next_view(True, tetris)
             await down(delay=tetris.delay)
+        restart(e)
 
     def restart(e):
         tetris.inits()
@@ -118,7 +129,7 @@ async def main(page: ft.Page):
  
 
     async def drop(e):
-        while tetris.current_tetromino.row > 0:
+        while tetris.current_tetromino.row >= 0:
             await down(delay=0)
 
     async def left_long(e):
