@@ -7,11 +7,8 @@ An attempt to implement a portable Tetris game from the 90s using cross platform
 
 ## TODO
 
-- Game oveer
 - Reset
-- Show Next tetromino
 - Save game
 - Options (Color, Clockwise)
 - Find implementation for long press button
-- Design
 
