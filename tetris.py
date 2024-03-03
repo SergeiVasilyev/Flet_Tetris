@@ -166,6 +166,8 @@ class Game:
     def dropped(self):
         for block in self.current_tetromino.shape():
             self.board[block.y][block.x] = 1
+            if sum(self.board[0]) > 0:
+                self.status = Status.GAME_OVER
         self.score += 10
         self.clear_full_lines()
         if self.score > self.hiscore:
