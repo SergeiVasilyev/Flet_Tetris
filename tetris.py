@@ -214,5 +214,14 @@ if __name__ == "__main__":
         #     game.new_tetromino()
         # print(game.board)
 
+    # Check what happen if tetromino has block outside board
+    t = TetrominoGenerator(cart=['I', 'O'])
+    tetris = t.add_next_tetromino()
+    tetris.rotate()
+    game.board[-2][5] = 1
+    print(game.board)
+    for n in tetris.shape():
+        print(n.x, n.y) 
+        print(n.is_block_inside_board())
     end_time = time.time()
     print(end_time - start_time)
