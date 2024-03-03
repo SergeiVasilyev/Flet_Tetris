@@ -53,6 +53,9 @@ class TetrominoGenerator:
         next = self.cart.pop(0)
         self.cart += self.generate_cart()
         return Tetromino(next)
+    
+    def get_next_tetromino(self):
+        return Tetromino(self.cart[0])
 
 class Status:
     INIT = 0
@@ -65,21 +68,24 @@ class Game:
         self.board = []
         self.lines = 0
         self.score = 0
-        self.level = 0
+        self.level = 1
         self.delay = 1
-        self.speed = 0
+        self.speed = 1
         self.hiscore = self.read_hiscore()
+        self.current_tetromino = None
+        self.next_tetromino = None
 
     def inits(self):
         self.status = Status.RUNNING
         self.tetromino_generator = TetrominoGenerator()
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+        self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         self.lines = 0
         self.score = 0
-        self.level = 0
+        self.level = 1
         self.delay = 1
-        self.speed = 0
+        self.speed = 1
     
 
     def read_hiscore(self):
@@ -92,6 +98,7 @@ class Game:
     def running(self):
         if not self.current_tetromino:
             self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+            self.next_tetromino = self.tetromino_generator.get_next_tetromino()
             self.current_tetromino.row = -1
         if self.current_tetromino:
             self.down()
@@ -99,6 +106,7 @@ class Game:
     def new_tetromino(self):
         self.current_tetromino.row = -1
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+        self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         
     def left(self):
         if not self.collision(col=-1):
@@ -112,9 +120,8 @@ class Game:
         if not self.collision(row=1):
             self.current_tetromino.row += 1
         else:
-            if self.collision(row=1):
-                self.dropped()
-                self.new_tetromino()
+            self.dropped()
+            self.new_tetromino()
 
     def collision(self, row=0, col=0):
         for block in self.current_tetromino.shape():
@@ -122,7 +129,7 @@ class Game:
                 return True
             elif block.x+col < 0 or block.x+col >= BOARD_WIDTH:
                 return True
-            elif self.board[block.y+row][block.x+col] == 1:
+            elif block.is_block_inside_board() and self.board[block.y+row][block.x+col] == 1: # Have to check if block is inside board first
                 return True
         return False
     
@@ -160,12 +167,15 @@ class Game:
     def dropped(self):
         for block in self.current_tetromino.shape():
             self.board[block.y][block.x] = 1
+            if sum(self.board[0]) > 0:
+                self.status = Status.GAME_OVER
         self.score += 10
         self.clear_full_lines()
         if self.score > self.hiscore:
             save_score('Tetris', self.score)
         self.hiscore = self.read_hiscore()
         
+    
 
     def clear_full_lines(self):
         lines = 0
@@ -176,10 +186,10 @@ class Game:
                 lines += 1
                               
         self.lines += lines
-        self.score += 100 * lines**2 + (self.level * 100)
-        self.level = int(self.lines / 10)
+        self.score += 100 * lines**2 + ((self.level-1) * 10)
+        self.level = 1 + self.lines // 10
         self.delay = 1.0 - self.lines // 20 * 0.1
-        self.speed = self.lines // 20
+        self.speed = 1 + self.lines // 20
 
 
 if __name__ == "__main__":
@@ -207,6 +217,17 @@ if __name__ == "__main__":
         #     game.dropped()
         #     game.new_tetromino()
         # print(game.board)
+
+    # Check what happen if tetromino has block outside board
+    t = TetrominoGenerator(cart=['I', 'O'])
+    tetris = t.add_next_tetromino()
+    tetris.rotate()
+    game.board[-2][5] = 1
+    print(game.board)
+    for n in tetris.shape():
+        print(n.x, n.y) 
+        print(n.is_block_inside_board())
+
 
     end_time = time.time()
     print(end_time - start_time)
