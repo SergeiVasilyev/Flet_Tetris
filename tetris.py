@@ -68,10 +68,12 @@ class Game:
         self.board = []
         self.lines = 0
         self.score = 0
-        self.level = 0
+        self.level = 1
         self.delay = 1
         self.speed = 1
         self.hiscore = self.read_hiscore()
+        self.current_tetromino = None
+        self.next_tetromino = None
 
     def inits(self):
         self.status = Status.RUNNING
@@ -81,7 +83,7 @@ class Game:
         self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         self.lines = 0
         self.score = 0
-        self.level = 0
+        self.level = 1
         self.delay = 1
         self.speed = 1
     
@@ -118,9 +120,8 @@ class Game:
         if not self.collision(row=1):
             self.current_tetromino.row += 1
         else:
-            if self.collision(row=1):
-                self.dropped()
-                self.new_tetromino()
+            self.dropped()
+            self.new_tetromino()
 
     def collision(self, row=0, col=0):
         for block in self.current_tetromino.shape():
@@ -174,6 +175,7 @@ class Game:
             save_score('Tetris', self.score)
         self.hiscore = self.read_hiscore()
         
+    
 
     def clear_full_lines(self):
         lines = 0
@@ -184,7 +186,7 @@ class Game:
                 lines += 1
                               
         self.lines += lines
-        self.score += 100 * lines**2 + (self.level * 100)
+        self.score += 100 * lines**2 + ((self.level-1) * 10)
         self.level = 1 + self.lines // 10
         self.delay = 1.0 - self.lines // 20 * 0.1
         self.speed = 1 + self.lines // 20
@@ -225,5 +227,7 @@ if __name__ == "__main__":
     for n in tetris.shape():
         print(n.x, n.y) 
         print(n.is_block_inside_board())
+
+
     end_time = time.time()
     print(end_time - start_time)
