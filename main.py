@@ -174,8 +174,8 @@ async def main(page: ft.Page):
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
     left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long, style=direction_btn_style)
     right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long, style=direction_btn_style)
-    up_btn = ft.ElevatedButton("Up", on_click=drop, style=direction_btn_style)
-    down_btn = ft.ElevatedButton("Drop", on_click=down, on_long_press=down_long, style=direction_btn_style)
+    up_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
+    down_btn = ft.ElevatedButton("Down", on_click=down, on_long_press=down_long, style=direction_btn_style)
     directions = [up_btn, left_btn, right_btn, down_btn, rotate_btn]
 
     buttons_block = buttons_layout(func_buttons, directions)
