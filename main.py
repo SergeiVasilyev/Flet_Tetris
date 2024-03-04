@@ -171,8 +171,17 @@ async def main(page: ft.Page):
 
     # Info screen
     info_container = ft.Container(
-        content=ft.Column([hiscore_label, hiscore, score_lable, score, level_lable, level, speed_lable, speed, next_label, next_viewer, game_over_label], 
-                          horizontal_alignment=ft.CrossAxisAlignment.END),
+        content=ft.Column([
+            ft.Column([hiscore_label, hiscore,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+            ft.Column([score_lable, score,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+            ft.Column([level_lable, level,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+            ft.Column([speed_lable, speed,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+            ft.Column([next_label, next_viewer,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+            ft.Column([game_over_label,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
+        ],
+            horizontal_alignment=ft.CrossAxisAlignment.END,
+            spacing=18
+        ),
         alignment=ft.alignment.center
     )
     main_screen.controls[1].content = info_container
