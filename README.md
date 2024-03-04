@@ -6,7 +6,7 @@ An attempt to implement a portable Tetris game from the 90s using cross platform
 ![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_mobile_02-800.png "Text to show on mouseover")
 
 
-## Instalation
+## Installation
 ```
 python -m venv venv
 ```
