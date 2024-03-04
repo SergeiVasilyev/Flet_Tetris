@@ -138,7 +138,7 @@ async def main(page: ft.Page):
  
 
     async def drop(e):
-        while tetris.current_tetromino.row >= 0:
+        while not tetris.current_tetromino.row <= 0:
             await down(delay=0)
 
     async def left_long(e):
@@ -207,7 +207,7 @@ async def main(page: ft.Page):
     page.padding = page_padding
     page.window_height = 800
     page.window_width = 500
-    page.fonts = {"LCD": "fonts/LCD.ttf"}
+    page.fonts = {"LCD": "fonts/LCD2N.TTF"}
     page.bgcolor = "#2980B9"
     await page.add_async(tetris_row, buttons_block)
 
