@@ -72,24 +72,24 @@ async def main(page: ft.Page):
             next_view(True, tetris)
             
             
-
     async def game(e):
+        if tetris.status != 1:
+            if tetris.next_tetromino:
+                next_view(False, tetris)
+            tetris.inits()
+            reset_screen()
+            update_dashboard()
+            next_view(True, tetris)
+
         while e.control.selected:
+            await down(delay=tetris.delay)
             if tetris.status == 2:
                 reset_screen()
                 start_btn.selected = False
                 await page.update_async()
                 tetris.status == 0
-                break
-            if tetris.status == 0:
-                if tetris.next_tetromino:
-                    next_view(False, tetris)
-                tetris.inits()
-                reset_screen()
-                update_dashboard()
-                next_view(True, tetris)
-            await down(delay=tetris.delay)
-        restart(e)
+            
+
 
     def restart(e):
         tetris.inits()
