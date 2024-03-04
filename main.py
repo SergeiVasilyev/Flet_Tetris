@@ -18,6 +18,7 @@ delay = ft.Text(f"Delay: 0", size=20, font_family=lcd_font)
 speed_lable = ft.Text(f"SPEED", size=15)
 speed = ft.Text(f"1", size=20, font_family=lcd_font)
 next_label = ft.Text(f"NEXT", size=15)
+game_over_label = ft.Text("", size=15)
 
 async def main(page: ft.Page):
     ms = MainScreen()
@@ -73,6 +74,7 @@ async def main(page: ft.Page):
             
             
     async def game(e):
+        game_over_label.value = ""
         if tetris.status != 1:
             if tetris.next_tetromino:
                 next_view(False, tetris)
@@ -82,12 +84,19 @@ async def main(page: ft.Page):
             next_view(True, tetris)
 
         while e.control.selected:
+            start_btn.label = ft.Text('Pause', color="black")
             await down(delay=tetris.delay)
             if tetris.status == 2:
                 reset_screen()
                 start_btn.selected = False
+                game_over_label.value = "GAME OVER"
+                start_btn.label = ft.Text('Start', color="black")
                 await page.update_async()
                 tetris.status == 0
+        else:
+            start_btn.label = ft.Text('Start', color="black")
+            await page.update_async()
+        
             
 
 
@@ -162,7 +171,7 @@ async def main(page: ft.Page):
 
     # Info screen
     info_container = ft.Container(
-        content=ft.Column([hiscore_label, hiscore, score_lable, score, level_lable, level, speed_lable, speed, next_label, next_viewer], 
+        content=ft.Column([hiscore_label, hiscore, score_lable, score, level_lable, level, speed_lable, speed, next_label, next_viewer, game_over_label], 
                           horizontal_alignment=ft.CrossAxisAlignment.END),
         alignment=ft.alignment.center
     )
