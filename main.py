@@ -85,7 +85,7 @@ async def main(page: ft.Page):
 
         while e.control.selected:
             start_btn.label = ft.Text('Pause', color="black")
-            await down(delay=tetris.delay)
+            await down_step(delay=tetris.delay)
             if tetris.status == 2:
                 reset_screen()
                 start_btn.selected = False
@@ -126,7 +126,7 @@ async def main(page: ft.Page):
         board_update(True, tetris)
         await page.update_async()
 
-    async def down(delay):
+    async def down_step(delay):
         if tetris.current_tetromino.row != -1:
             board_update(False, tetris)
         if not tetris.collision(row=1):
@@ -136,10 +136,21 @@ async def main(page: ft.Page):
         await asyncio.sleep(delay)
         await set_dropped()
  
-
     async def drop(e):
         while not tetris.current_tetromino.row <= 0:
-            await down(delay=0)
+            board_update(False, tetris)
+            if not tetris.collision(row=1):
+                tetris.down()
+            else:
+                await set_dropped()
+        await page.update_async()
+
+    async def down(e):
+        await down_step(delay=0)
+
+    async def down_long(e):
+        while not tetris.current_tetromino.row <= 0:
+            await down_step(delay=0)
 
     async def left_long(e):
         while not tetris.collision(col=-1):
@@ -164,8 +175,8 @@ async def main(page: ft.Page):
     left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long, style=direction_btn_style)
     right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long, style=direction_btn_style)
     up_btn = ft.ElevatedButton("Up", on_click=drop, style=direction_btn_style)
-    drop_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
-    directions = [up_btn, left_btn, right_btn, drop_btn, rotate_btn]
+    down_btn = ft.ElevatedButton("Drop", on_click=down, on_long_press=down_long, style=direction_btn_style)
+    directions = [up_btn, left_btn, right_btn, down_btn, rotate_btn]
 
     buttons_block = buttons_layout(func_buttons, directions)
 
