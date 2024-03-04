@@ -157,7 +157,7 @@ async def main(page: ft.Page):
     rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
 
     # Buttons
-    start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", )
+    start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"))
     restart_btn = ft.ElevatedButton("R", on_click=restart, style=func_btn_style)
     func_buttons = [start_btn, restart_btn]
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
