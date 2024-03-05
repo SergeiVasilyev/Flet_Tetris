@@ -29,7 +29,11 @@ async def main(page: ft.Page):
     hiscore.value = f"{tetris.hiscore}"
     
     
-    def reset_screen(refresh=False):
+    def reset_screen(refresh=False) -> None:
+        """
+        Reset the screen with optional refresh.
+        :param refresh: boolean, optional, whether to refresh the screen
+        """
         for y in range(20):
             for x in range(10):
                 color = BRIGHT_COLOR if refresh and tetris.board[y][x] == 1 else MUTE_COLOR
@@ -37,14 +41,27 @@ async def main(page: ft.Page):
                 main_container.controls[y*10+x].content.controls[0].bgcolor = color
         
 
-    def board_update(is_show, tetris):
+    def board_update(is_show, tetris) -> None:
+        """
+        Update the board with the current tetromino's shape by changing the border and background color of the corresponding controls. 
+
+        Parameters:
+            is_show (bool): A flag indicating whether to show or hide the tetromino.
+            tetris (Tetris): The Tetris object containing the current tetromino.
+        """
         if tetris.current_tetromino:
             for block in tetris.current_tetromino.shape():
                 block.y = 0 if block.y < 0 or block.y >= 20 else block.y
                 main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
-    def next_view(is_show, tetris):
+    def next_view(is_show, tetris) -> None:
+        """
+        Function to update the next tetromino view based on the provided visibility flag and tetris state.
+
+        :param is_show: bool - Flag to indicate whether to show the next tetromino view
+        :param tetris: Tetris - The tetris state object
+        """
         t = tetris.next_tetromino
         if t:
             for block in t.shape():
