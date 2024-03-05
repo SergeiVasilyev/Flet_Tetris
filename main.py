@@ -62,6 +62,7 @@ async def main(page: ft.Page):
         :param is_show: bool - Flag to indicate whether to show the next tetromino view
         :param tetris: Tetris - The tetris state object
         """
+        print(tetris.next_tetromino)
         t = tetris.next_tetromino
         if t:
             for block in t.shape():
@@ -85,7 +86,7 @@ async def main(page: ft.Page):
                 next_view(False, tetris)
                 tetris.dropped()
                 tetris.new_tetromino()
-            reset_screen(True)
+            # reset_screen(True)
             update_dashboard()
             next_view(True, tetris)
             
@@ -146,19 +147,20 @@ async def main(page: ft.Page):
     async def down_step(delay):
         if tetris.current_tetromino.row != -1:
             board_update(False, tetris)
-        if not tetris.collision(row=1):
-            tetris.down()
+        tetris.down()
         board_update(True, tetris)
         await page.update_async()
         await asyncio.sleep(delay)
         await set_dropped()
  
     async def drop(e):
+        board_update(False, tetris)
         while not tetris.current_tetromino.row <= 0:
-            board_update(False, tetris)
+            
             if not tetris.collision(row=1):
                 tetris.down()
             else:
+                board_update(True, tetris)
                 await set_dropped()
         await page.update_async()
 

@@ -45,7 +45,7 @@ class TetrominoGenerator:
     def __init__(self, cart=None):
         self.cart = self.generate_cart() if cart is None else cart
 
-    @classmethod
+    # @classmethod
     def generate_cart(cls):
         return [random.choice([*TETROMINOES]) for _ in range(2)]
 
@@ -65,7 +65,17 @@ class Status:
 
 class Game:
     def __init__(self):
-        self.inits()
+        self.status = Status.RUNNING
+        self.tetromino_generator = TetrominoGenerator()
+        self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
+        self.current_tetromino = self.tetromino_generator.add_next_tetromino()
+        self.next_tetromino = self.tetromino_generator.get_next_tetromino()
+        self.hiscore = self.read_hiscore
+        self.lines = 0
+        self.score = 0
+        self.level = 1
+        self.delay = 1
+        self.speed = 1
 
     def inits(self):
         self.status = Status.RUNNING
@@ -189,36 +199,37 @@ if __name__ == "__main__":
 
     t = TetrominoGenerator()
     print(t.cart)
-    tetris = t.add_next_tetromino()
-    for block in tetris.shape():
-        print(block.x, block.y)
+    print(t.get_next_tetromino().tetromino)
+    # tetris = t.add_next_tetromino()
+    # for block in tetris.shape():
+    #     print(block.x, block.y)
     
-    print(tetris.rotate())
+    # print(tetris.rotate())
 
-    for block in tetris.shape():
-        print(block.x, block.y)
+    # for block in tetris.shape():
+    #     print(block.x, block.y)
 
-    game = Game()
-    game.inits()
-    print(game.board)
+    # game = Game()
+    # game.inits()
+    # print(game.board)
 
-    for n in range(38):
-        game.down()
-        print(game.current_tetromino.row)
+    # for n in range(38):
+    #     game.down()
+    #     print(game.current_tetromino.row)
         # if game.collision(row=1):
         #     game.dropped()
         #     game.new_tetromino()
         # print(game.board)
 
     # Check what happen if tetromino has block outside board
-    t = TetrominoGenerator(cart=['I', 'O'])
-    tetris = t.add_next_tetromino()
-    tetris.rotate()
-    game.board[-2][5] = 1
-    print(game.board)
-    for n in tetris.shape():
-        print(n.x, n.y) 
-        print(n.is_block_inside_board())
+    # t = TetrominoGenerator(cart=['I', 'O'])
+    # tetris = t.add_next_tetromino()
+    # tetris.rotate()
+    # game.board[-2][5] = 1
+    # print(game.board)
+    # for n in tetris.shape():
+    #     print(n.x, n.y) 
+    #     print(n.is_block_inside_board())
 
 
     end_time = time.time()
