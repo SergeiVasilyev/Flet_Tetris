@@ -42,20 +42,21 @@ class Tetromino:
     
 
 class TetrominoGenerator:
-    def __init__(self, cart=[]):
-        self.cart = self.generate_cart() if not cart else cart
+    def __init__(self, cart=None):
+        self.cart = self.generate_cart() if cart is None else cart
 
-    def generate_cart(self):
-        cart = [random.choice([*TETROMINOES]) for _ in range(2)]
-        return cart
-    
+    @classmethod
+    def generate_cart(cls):
+        return [random.choice([*TETROMINOES]) for _ in range(2)]
+
     def add_next_tetromino(self):
-        next = self.cart.pop(0)
-        self.cart += self.generate_cart()
-        return Tetromino(next)
-    
+        next_tetramino, self.cart = self.cart[0], self.cart[1:] + [random.choice([*TETROMINOES])]
+        print(self.cart)
+        return Tetromino(next_tetramino)
+
     def get_next_tetromino(self):
         return Tetromino(self.cart[0])
+
 
 class Status:
     INIT = 0
@@ -64,16 +65,7 @@ class Status:
 
 class Game:
     def __init__(self):
-        self.status = Status.INIT
-        self.board = []
-        self.lines = 0
-        self.score = 0
-        self.level = 1
-        self.delay = 1
-        self.speed = 1
-        self.hiscore = self.read_hiscore()
-        self.current_tetromino = None
-        self.next_tetromino = None
+        self.inits()
 
     def inits(self):
         self.status = Status.RUNNING
@@ -81,6 +73,7 @@ class Game:
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
         self.next_tetromino = self.tetromino_generator.get_next_tetromino()
+        self.hiscore = self.read_hiscore
         self.lines = 0
         self.score = 0
         self.level = 1
@@ -88,11 +81,10 @@ class Game:
         self.speed = 1
     
 
+    @property
     def read_hiscore(self):
         obj = read_score()
-        if obj:
-            return obj['score']
-        return 0
+        return obj['score'] if obj else 0
 
 
     def running(self):
@@ -173,7 +165,7 @@ class Game:
         self.clear_full_lines()
         if self.score > self.hiscore:
             save_score('Tetris', self.score)
-        self.hiscore = self.read_hiscore()
+        self.hiscore = self.read_hiscore
         
     
 
