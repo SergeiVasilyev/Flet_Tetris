@@ -15,12 +15,14 @@ class Block:
 
 
 class Tetromino:
-    def __init__(self, element_name):
+    def __init__(self, element_name: str):
+        if element_name not in TETROMINOES:
+            raise ValueError(f"{element_name} is not a valid Tetromino element name.")
+
         self.tetromino = TETROMINOES[element_name]
         self.row = -1
         self.col = BOARD_WIDTH // 2
         self.orientation = 0
-        self.dropped = False
 
     def is_shape_inside_board(self) -> bool:
         """Check if the entire shape is inside the board."""
