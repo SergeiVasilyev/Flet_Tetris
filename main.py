@@ -266,7 +266,7 @@ async def main(page: ft.Page):
     # Page view settings
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.padding = page_padding
+    page.padding = PAGE_PADDING
     page.window_height = WINDOW_HEIGHT
     page.window_width = WINDOW_WIDTH
     page.fonts = FONTS

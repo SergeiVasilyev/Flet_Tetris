@@ -15,7 +15,7 @@ MUTE_COLOR = ft.colors.GREY_500
 BRIGHT_COLOR = ft.colors.BLACK
 
 # Game init settings
-page_padding = 5
+PAGE_PADDING = 5
 horizontal_offset = 4
 
 ROW_POSITION =- 1
