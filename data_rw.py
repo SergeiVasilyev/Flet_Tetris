@@ -21,8 +21,3 @@ def read_score():
     except:
         return None
     return obj
-
-
-if __name__ == '__main__':
-    
-    print(read_score())
