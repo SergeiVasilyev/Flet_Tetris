@@ -12,6 +12,7 @@ class Block:
         self.y = y
     
     def is_block_inside_board(self):
+        """Check if the block is inside the game board."""
         return self.x in range(BOARD_WIDTH) and self.y in range(BOARD_HEIGHT)
 
 
@@ -23,20 +24,24 @@ class Tetromino:
         self.orientation = 0
         self.dropped = False
 
-    def is_shape_inside_board(self):
+    def is_shape_inside_board(self) -> bool:
+        """Check if the entire shape is inside the board."""
         for block in self.shape():
             if not block.is_block_inside_board():
                 return False
         return True
 
-    def rotate(self, back=False):
+    def rotate(self, back=False) -> int:
+        """Rotate the orientation of the object by 90 degrees in the specified direction.
+        :param back: a boolean indicating whether to rotate in the opposite direction (default is False)
+        :return: the new orientation value after rotation
+        """
         direction = 1 if back else -1
         self.orientation = (self.orientation + direction) % 4
         return self.orientation
 
-    def shape(self):
-        # for x, y in self.tetromino:
-        #     yield Block(self.col + x, self.row + y)
+    def shape(self) -> list:
+        """Returns a list of Block objects representing the shape of the tetromino at its current orientation."""
         return [Block(self.col + x, self.row + y) for x, y in self.tetromino[self.orientation]]
 
     
@@ -45,17 +50,18 @@ class TetrominoGenerator:
     def __init__(self, cart=None):
         self.cart = None
 
-    # @classmethod
-    def generate_cart(self):
+    def generate_cart(self) -> list:
+        """Generate a cart by randomly choosing two elements from the TETROMINOES list."""
         return [random.choice([*TETROMINOES]) for _ in range(2)]
 
-    def add_next_tetromino(self):
+    def add_next_tetromino(self) -> Tetromino:
+        """Generates the next tetromino and returns it."""
         self.cart = self.generate_cart() if not self.cart else self.cart
         next_tetramino, self.cart = self.cart[0], self.cart[1:] + [random.choice([*TETROMINOES])]
-        print(self.cart)
         return Tetromino(next_tetramino)
 
-    def get_next_tetromino(self):
+    def get_next_tetromino(self) -> Tetromino:
+        """Return the next Tetromino object based on the first element in the cart."""
         return Tetromino(self.cart[0])
 
 
@@ -199,47 +205,6 @@ class Game:
         self.lines += lines
         self.score += 100 * lines**2 + ((self.level-1) * 10) 
         self.level = 1 + self.lines // 10
-        self.delay = 1.0 - self.lines // 20 * 0.1 # max(0.1, 1.0 - (self.lines // 20) * 0.1)
+        self.delay = max(0.1, 1.0 - (self.lines // 20) * 0.1)
         self.speed = 1 + self.lines // 20
 
-
-if __name__ == "__main__":
-    start_time = time.time()
-
-    t = TetrominoGenerator()
-    print(t.cart)
-    print(t.get_next_tetromino().tetromino)
-    # tetris = t.add_next_tetromino()
-    # for block in tetris.shape():
-    #     print(block.x, block.y)
-    
-    # print(tetris.rotate())
-
-    # for block in tetris.shape():
-    #     print(block.x, block.y)
-
-    # game = Game()
-    # game.inits()
-    # print(game.board)
-
-    # for n in range(38):
-    #     game.down()
-    #     print(game.current_tetromino.row)
-        # if game.collision(row=1):
-        #     game.dropped()
-        #     game.new_tetromino()
-        # print(game.board)
-
-    # Check what happen if tetromino has block outside board
-    # t = TetrominoGenerator(cart=['I', 'O'])
-    # tetris = t.add_next_tetromino()
-    # tetris.rotate()
-    # game.board[-2][5] = 1
-    # print(game.board)
-    # for n in tetris.shape():
-    #     print(n.x, n.y) 
-    #     print(n.is_block_inside_board())
-
-
-    end_time = time.time()
-    print(end_time - start_time)
