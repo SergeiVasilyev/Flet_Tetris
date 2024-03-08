@@ -51,7 +51,7 @@ async def main(page: ft.Page):
         """
         if tetris.current_tetromino:
             for block in tetris.current_tetromino.shape():
-                block.y = 0 if block.y < 0 or block.y >= 20 else block.y
+                is_show = False if block.y < 0 or block.y >= 20 else is_show # TODO Сдалать проверку на выход за границы
                 main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
@@ -62,12 +62,16 @@ async def main(page: ft.Page):
         :param is_show: bool - Flag to indicate whether to show the next tetromino view
         :param tetris: Tetris - The tetris state object
         """
-        print(tetris.next_tetromino)
-        t = tetris.next_tetromino
-        if t:
-            for block in t.shape():
+        next_tetromino = tetris.next_tetromino
+        if next_tetromino:
+            for block in next_tetromino.shape():
                 next_viewer.content.controls[block.y * 4 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 next_viewer.content.controls[block.y * 4 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
+
+    def clear_next_view():
+        for i in range(8):
+            next_viewer.content.controls[i].border = ft.border.all(2, MUTE_COLOR)
+            next_viewer.content.controls[i].content.controls[0].bgcolor = MUTE_COLOR
 
     def update_dashboard():
         global lines, level, score, delay, hiscore_label, hiscore
@@ -80,13 +84,13 @@ async def main(page: ft.Page):
 
 
     async def set_dropped(wait=0.5):
-        if tetris.collision(row=1): 
+        if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): 
             await asyncio.sleep(wait) # last chance to move tetromino
-            if tetris.collision(row=1): # check again if tetromino can move
+            if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): # check again if tetromino can move
                 next_view(False, tetris)
                 tetris.dropped()
                 tetris.new_tetromino()
-            # reset_screen(True)
+            reset_screen(True)
             update_dashboard()
             next_view(True, tetris)
             
@@ -100,7 +104,7 @@ async def main(page: ft.Page):
             reset_screen()
             update_dashboard()
             next_view(True, tetris)
-
+        
         while e.control.selected:
             start_btn.label = ft.Text('Pause', color="black")
             await down_step(delay=tetris.delay)
@@ -119,8 +123,10 @@ async def main(page: ft.Page):
 
 
     def restart(e):
+        clear_next_view()
         tetris.inits()
         reset_screen()
+        next_view(True, tetris)
 
     async def rotate(e):
         board_update(False, tetris)
@@ -155,13 +161,12 @@ async def main(page: ft.Page):
  
     async def drop(e):
         board_update(False, tetris)
-        while not tetris.current_tetromino.row <= 0:
-            
-            if not tetris.collision(row=1):
-                tetris.down()
-            else:
+        while not tetris.current_tetromino.row < 0:
+            tetris.down()
+            if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
                 board_update(True, tetris)
                 await set_dropped()
+                break
         await page.update_async()
 
     async def down(e):
@@ -172,11 +177,11 @@ async def main(page: ft.Page):
             await down_step(delay=0)
 
     async def left_long(e):
-        while not tetris.collision(col=-1):
+        while not tetris.collision_check([tetris.left_condition], col=-1):
             await left(e)
 
     async def right_long(e):
-        while not tetris.collision(col=1):
+        while not tetris.collision_check([tetris.right_condition],col=1):
             await right(e)
 
 
