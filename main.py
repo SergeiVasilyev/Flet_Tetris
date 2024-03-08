@@ -6,29 +6,28 @@ from main_screen import MainScreen
 from tetris import Game
 
 
-lcd_font = "LCD"
-hiscore_label = ft.Text(f"HI-SCORE", size=15)
-hiscore = ft.Text(f"0", size=20, font_family=lcd_font, text_align=ft.TextAlign.CENTER)
-lines = ft.Text(f"Lines: 0", size=20, font_family=lcd_font)
-score_lable = ft.Text(f"SCORE", size=15)
-score = ft.Text(f"0", size=20, font_family=lcd_font, text_align=ft.TextAlign.CENTER)
-level_lable = ft.Text(f"LEVEL", size=15)
-level = ft.Text(f"1", size=20, font_family=lcd_font)
-delay = ft.Text(f"Delay: 0", size=20, font_family=lcd_font)
-speed_lable = ft.Text(f"SPEED", size=15)
-speed = ft.Text(f"1", size=20, font_family=lcd_font)
-next_label = ft.Text(f"NEXT", size=15)
-game_over_label = ft.Text("", size=15)
+# Game screen layout 
+ms = MainScreen()
+main_screen = ms.background()
+next_viewer = ms.next_tetromino_viewer()
+main_container = main_screen.controls[0].content
+tetris = Game()
 
-async def main(page: ft.Page):
-    ms = MainScreen()
-    main_screen = ms.background()
-    next_viewer = ms.next_tetromino_viewer()
-    main_container = main_screen.controls[0].content
-    tetris = Game()
-    hiscore.value = f"{tetris.hiscore}"
-    
-    
+# Initialization dashboard elements
+lcd_font = "LCD"
+hiscore_label = ft.Text(f"HI-SCORE", size=15, color="black")
+hiscore = ft.Text(f"{tetris.hiscore}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+score_lable = ft.Text(f"SCORE", size=15, color="black")
+score = ft.Text(f"0", size=20, color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+level_lable = ft.Text(f"LEVEL", size=15, color="black")
+level = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
+speed_lable = ft.Text(f"SPEED", size=15, color="black")
+speed = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
+next_label = ft.Text(f"NEXT", size=15, color="black")
+game_over_label = ft.Text("", size=15, color="black")
+
+
+async def main(page: ft.Page):    
     def reset_screen(refresh=False) -> None:
         """
         Reset the screen with optional refresh.
@@ -68,36 +67,45 @@ async def main(page: ft.Page):
                 next_viewer.content.controls[block.y * 4 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 next_viewer.content.controls[block.y * 4 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
-    def clear_next_view():
+    def clear_next_tetromino_field():
+        """Clear the next tetromino field."""
         for i in range(8):
             next_viewer.content.controls[i].border = ft.border.all(2, MUTE_COLOR)
             next_viewer.content.controls[i].content.controls[0].bgcolor = MUTE_COLOR
 
     def update_dashboard():
+        """Update the dashboard with the current game statistics including lines, level, score, delay, and speed."""
         global lines, level, score, delay, hiscore_label, hiscore
         hiscore.value = f"{tetris.hiscore}"
-        lines.value = f"Lines: {tetris.lines}"
         level.value = f"{tetris.level}"
         score.value = f"{tetris.score}"
-        delay.value = f"Delay: {tetris.delay}"
         speed.value = f"{tetris.speed}"
 
 
-    async def set_dropped(wait=0.5):
+    async def set_dropped_and_update(wait=0.5):
+        """
+        An asynchronous function that sets the dropped state of the tetromino in the Tetris game. 
+        It takes an optional 'wait' parameter with a default value of 0.5. 
+        This function performs collision checks to determine if the tetromino can move, and if not, 
+        it drops the tetromino, generates a new one, and updates the dashboard. 
+        """
         if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): 
             await asyncio.sleep(wait) # last chance to move tetromino
             if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): # check again if tetromino can move
-                next_view(False, tetris)
-                tetris.dropped()
-                tetris.new_tetromino()
-            reset_screen(True)
-            update_dashboard()
-            next_view(True, tetris)
+                next_view(False, tetris) # hide next tetromino on the dashboard
+                tetris.dropped() # drop the tetromino
+                tetris.new_tetromino() # Generate new tetromino and reset tetromino row to -1
+            reset_screen(True) # refresh the screen
+            update_dashboard() # update the dashboard
+            next_view(True, tetris) # show next tetromino on the dashboard
             
             
     async def game(e):
+        """An asynchronous function that controls the game flow, 
+        including initialization, updating the dashboard, and handling game over and pause states.
+        """
         game_over_label.value = ""
-        if tetris.status != 1:
+        if tetris.status != 1: # if game is not running
             if tetris.next_tetromino:
                 next_view(False, tetris)
             tetris.inits()
@@ -105,82 +113,99 @@ async def main(page: ft.Page):
             update_dashboard()
             next_view(True, tetris)
         
+        # while game is running and not paused
         while e.control.selected:
             start_btn.label = ft.Text('Pause', color="black")
             await down_step(delay=tetris.delay)
-            if tetris.status == 2:
+            if tetris.status == 2: # if game is over
                 reset_screen()
                 start_btn.selected = False
-                game_over_label.value = "GAME OVER"
                 start_btn.label = ft.Text('Start', color="black")
-                await page.update_async()
+                page.update()
                 tetris.status == 0
         else:
             start_btn.label = ft.Text('Start', color="black")
-            await page.update_async()
+            game_over_label.value = "PAUSE" if tetris.status == 1 else "GAME OVER"
+            page.update()
         
-            
-
 
     def restart(e):
-        clear_next_view()
+        """
+        Restarts the game by clearing the next tetromino field, initializing the tetris game, resetting the screen, and updating the next tetromino view.
+        Parameters:
+            e: the event that triggers the restart function
+        """
+        clear_next_tetromino_field()
         tetris.inits()
         reset_screen()
         next_view(True, tetris)
 
     async def rotate(e):
+        """Rotates tetromino and updates screen."""
         board_update(False, tetris)
         tetris.rotate()
         board_update(True, tetris)
-        await page.update_async()
+        page.update()
 
     async def left(e):
+        """Moves tetromino to the left and updates screen."""
         if tetris.current_tetromino.row >= 0:
             board_update(False, tetris)
         
         tetris.left()
         board_update(True, tetris)
-        await page.update_async()
+        page.update()
 
     async def right(e):
+        """Moves tetromino to the right and updates screen."""
         if tetris.current_tetromino.row >= 0:
             board_update(False, tetris)
         
         tetris.right()
         board_update(True, tetris)
-        await page.update_async()
+        page.update()
 
     async def down_step(delay):
+        """
+        Asynchronously moves the current tetromino down, and delays the next action.
+        :param delay: The time delay in seconds before the next action.
+        """
         if tetris.current_tetromino.row != -1:
             board_update(False, tetris)
         tetris.down()
         board_update(True, tetris)
-        await page.update_async()
-        await asyncio.sleep(delay)
-        await set_dropped()
+        page.update()
+        await asyncio.sleep(delay) # Main delay
+        await set_dropped_and_update()
+ 
  
     async def drop(e):
+        """Drops the current tetromino."""
         board_update(False, tetris)
         while not tetris.current_tetromino.row < 0:
             tetris.down()
             if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
                 board_update(True, tetris)
-                await set_dropped()
+                await set_dropped_and_update()
                 break
-        await page.update_async()
+        page.update()
 
     async def down(e):
+        """Moves the current tetromino down."""
         await down_step(delay=0)
 
     async def down_long(e):
+        """Moves the current tetromino down if button is held."""
         while not tetris.current_tetromino.row <= 0:
             await down_step(delay=0)
 
     async def left_long(e):
+        """Moves the current tetromino to the left if button is held."""
         while not tetris.collision_check([tetris.left_condition], col=-1):
             await left(e)
 
     async def right_long(e):
+        """Moves the current tetromino to the right if button is held."""
         while not tetris.collision_check([tetris.right_condition],col=1):
             await right(e)
 
@@ -204,7 +229,7 @@ async def main(page: ft.Page):
 
     buttons_block = buttons_layout(func_buttons, directions)
 
-    # Info screen
+    # Dashboard
     info_container = ft.Container(
         content=ft.Column([
             ft.Column([hiscore_label, hiscore,], horizontal_alignment=ft.CrossAxisAlignment.END, spacing=5),
@@ -221,6 +246,7 @@ async def main(page: ft.Page):
     )
     main_screen.controls[1].content = info_container
 
+    # Borders around main screen
     main_screen_container = ft.Container(
         content=main_screen,
         border=ft.border.only(
@@ -237,14 +263,15 @@ async def main(page: ft.Page):
         alignment=ft.MainAxisAlignment.CENTER,
     )
 
+    # Page view settings
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = page_padding
-    page.window_height = 800
-    page.window_width = 500
-    page.fonts = {"LCD": "fonts/LCD2N.TTF"}
-    page.bgcolor = "#2980B9"
-    await page.add_async(tetris_row, buttons_block)
+    page.window_height = WINDOW_HEIGHT
+    page.window_width = WINDOW_WIDTH
+    page.fonts = FONTS
+    page.bgcolor = PAGE_BACKGROUND_COLOR
+    page.add(tetris_row, buttons_block)
 
 ft.app(target=main)
 
