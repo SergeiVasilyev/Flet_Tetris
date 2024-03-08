@@ -169,15 +169,19 @@ class Game:
 
     def dropped(self):
         """Update board and score after a piece has been dropped."""
+        # Set the current tetromino to the board
         for block in self.current_tetromino.shape():
             self.board[block.y][block.x] = 1
 
+        # If the board is full, end the game
         if any(self.board[0]):
             self.status = Status.GAME_OVER
 
+        # Update the score
         self.score += 10
         self.clear_full_lines()
-
+        
+        # Update the high score
         if self.score > self.hiscore:
             save_score('Tetris', self.score)
             self.hiscore = self.score
