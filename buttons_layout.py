@@ -3,7 +3,15 @@ from settings import *
 
 
 
-def buttons_layout(func_buttons, directions):
+def buttons_layout(func_buttons, directions) -> ft.Column:
+    """Generates a layout for buttons based on the provided functional buttons and directions.
+    Args:
+        func_buttons: A tuple containing the start button and restart button.
+        directions: A tuple containing the up button, left button, right button, drop button, and rotate button.
+
+    Returns:
+        The layout for the buttons block.
+    """
     start_btn, restart_btn = func_buttons
     up_btn, left_btn, right_btn, drop_btn, rotate_btn = directions
     
