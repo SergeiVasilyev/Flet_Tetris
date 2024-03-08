@@ -1,8 +1,6 @@
-import asyncio
 import random
 from tetrominoes import TETROMINOES, EL_T, EL_L, EL_J, EL_O, EL_I, EL_S, EL_Z
 from settings import *
-import time
 from data_rw import read_score, save_score
 
 
