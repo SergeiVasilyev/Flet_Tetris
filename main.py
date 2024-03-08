@@ -50,9 +50,9 @@ async def main(page: ft.Page):
         """
         if tetris.current_tetromino:
             for block in tetris.current_tetromino.shape():
-                show_block = False if block.y < 0 or block.y >= 20 else is_show # check if the block is outside the board
-                main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if show_block else MUTE_COLOR)
-                main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if show_block else MUTE_COLOR
+                if block.y >= 0 and block.y <= 20:
+                    main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
+                    main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
     def next_view(is_show, tetris) -> None:
         """
