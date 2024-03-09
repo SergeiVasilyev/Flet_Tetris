@@ -48,15 +48,22 @@ class Tetromino:
 
 class TetrominoGenerator:
     def __init__(self, cart=None):
-        self.cart = None
+        self._cart = cart
 
-    def generate_cart(self) -> list:
+    @property
+    def cart(self) -> list:
         """Generate a cart by randomly choosing two elements from the TETROMINOES list."""
-        return [random.choice([*TETROMINOES]) for _ in range(2)]
+        if not self._cart:
+            return [random.choice([*TETROMINOES]) for _ in range(2)]
+        return self._cart
+    
+    @cart.setter
+    def cart(self, cart):
+        self._cart = cart
 
     def add_next_tetromino(self) -> Tetromino:
-        """Generates the next tetromino and returns it."""
-        self.cart = self.generate_cart() if not self.cart else self.cart
+        """Gets first element from the cart, removes it from the cart and return the new Tetromino object based on the first element.
+        After that, add a new element to the cart"""
         next_tetramino, self.cart = self.cart[0], self.cart[1:] + [random.choice([*TETROMINOES])]
         return Tetromino(next_tetramino)
 
