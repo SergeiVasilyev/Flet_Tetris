@@ -182,6 +182,10 @@ class Game:
 
     def dropped(self):
         """Update board and score after a piece has been dropped."""
+        
+        if not self.current_tetromino.is_shape_inside_board():
+            raise ValueError("Tetromino is out of the board")
+        
         # Set the current tetromino to the board
         for block in self.current_tetromino.shape():
             self.board[block.y][block.x] = 1
