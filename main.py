@@ -201,12 +201,12 @@ async def main(page: ft.Page):
 
     async def left_long(e):
         """Moves the current tetromino to the left if button is held."""
-        while not tetris.collision_check([tetris.left_condition], col=-1):
+        while not tetris.collision_check([tetris.left_condition, tetris.board_condition], col=-1):
             await left(e)
 
     async def right_long(e):
         """Moves the current tetromino to the right if button is held."""
-        while not tetris.collision_check([tetris.right_condition],col=1):
+        while not tetris.collision_check([tetris.right_condition, tetris.board_condition],col=1):
             await right(e)
 
 

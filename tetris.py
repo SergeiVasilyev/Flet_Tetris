@@ -119,13 +119,13 @@ class Game:
 
     def left(self):
         """Move the tetromino left if the left condition does not cause a collision."""
-        if not self.collision_check([self.left_condition], col=-1):
+        if not self.collision_check([self.left_condition, self.board_condition], col=-1):
             self.current_tetromino.col -= 1
 
 
     def right(self):
         """Move the current tetromino to the right, if there is no collision with the right condition."""
-        if not self.collision_check([self.right_condition], col=1):
+        if not self.collision_check([self.right_condition, self.board_condition], col=1):
             self.current_tetromino.col += 1
             
 
