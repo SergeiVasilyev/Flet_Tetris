@@ -1,6 +1,6 @@
 # Flet Tetris game
 
-An attempt to implement a portable Tetris game from the 90s using cross platform Flet framework
+An attempt to implement a console Tetris game from the 90s using cross platform Flet framework
 
 Python version 3.10.11
 Flet version 0.21.1
