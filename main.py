@@ -19,7 +19,7 @@ main_container = main_screen.controls[0].content
 tetris = Game()
 op = Options()
 options = op.options_fn(ms.main_cont_width+150, ms.main_cont_height)
-options_hiscore = options.content.controls[0].controls[2].content.controls[0].value
+# options_hiscore = options.content.controls[0].controls[2].content.controls[0].value
 
 # Initialization dashboard elements
 lcd_font = "LCD"
@@ -223,8 +223,7 @@ async def main(page: ft.Page):
     async def settings(e):
         global main_screen_stack, main_screen
         if not e.control.selected:
-            # print(options.content.controls[0].controls[2].content.controls[0].value)
-            op.reset_highscrore_label.value = f"RESET HIGHSCORE {tetris.hiscore_rw}"
+            op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
             main_screen_stack = main_screen.controls.copy()
             main_screen.controls[0] = options
             main_screen.controls.pop() 
@@ -237,7 +236,7 @@ async def main(page: ft.Page):
     def reset_highscrore(e):
         tetris.hiscore_rw = 0
         hiscore.value = 0
-        op.reset_highscrore_label.value = f"RESET HIGHSCORE {tetris.hiscore_rw}"
+        op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
         page.update()
 
     # Option buttons
