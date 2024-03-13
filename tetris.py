@@ -84,7 +84,7 @@ class Game:
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
         self.next_tetromino = self.tetromino_generator.get_next_tetromino()
-        self.hiscore = self.read_hiscore
+        self.hiscore = self.hiscore_rw
         self.lines = 0
         self.score = 0
         self.level = 1
@@ -97,13 +97,17 @@ class Game:
 
 
     @property
-    def read_hiscore(self) -> int:
+    def hiscore_rw(self) -> int:
         """
         This function is a property method that returns the highest score from the read_score object. 
         It does not take any parameters and returns an integer value representing the highest score, or 0 if the read_score object is empty.
         """
         obj = read_score()
         return obj['score'] if obj else 0
+    
+    @hiscore_rw.setter
+    def hiscore_rw(self, score):
+        save_score('Tetris', score)
 
     
     def new_tetromino(self) -> None:
