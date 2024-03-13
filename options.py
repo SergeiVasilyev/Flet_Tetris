@@ -1,5 +1,6 @@
 import flet as ft
 from main_screen import MainScreen
+from settings import *
 
 
 
@@ -7,7 +8,7 @@ class Options:
     def __init__(self) -> None:
         self.title = ft.Text("OPTIONS", size=30, color="black")
         self.clockwise = ft.Switch()
-        self.reset_highscrore_label = ft.Text(f"RESET HIGHSCORE 0", size=16)
+        self.reset_highscrore_label = ft.Text(f"{OPTIONS_LABELS[1]} 0", size=16)
         self.reset_highscrore = ft.ElevatedButton("RESET")
         self.save_game = ft.ElevatedButton("SAVE")
         self.load_game = ft.ElevatedButton("LOAD")
