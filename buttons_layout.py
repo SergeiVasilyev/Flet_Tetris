@@ -12,13 +12,14 @@ def buttons_layout(func_buttons, directions) -> ft.Column:
     Returns:
         The layout for the buttons block.
     """
-    start_btn, restart_btn = func_buttons
+
     up_btn, left_btn, right_btn, drop_btn, rotate_btn = directions
     
     # Func buttons
-    func_buttons = ft.Row([start_btn, restart_btn], alignment=ft.MainAxisAlignment.END)
+    func_buttons = ft.Row([*func_buttons], alignment=ft.MainAxisAlignment.END, spacing=10)
     func_buttons_container = ft.Container(
         content=func_buttons,
+        padding=ft.Padding(0, 0, 30, 0),
     )
 
     # Direction buttons
