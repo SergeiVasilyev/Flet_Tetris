@@ -2,31 +2,32 @@ import flet as ft
 from main_screen import MainScreen
 
 
-# ms = MainScreen()
-# main_screen = ms.background()
 
-def options_fn(ms):
+class Options:
+    def __init__(self) -> None:
+        self.title = ft.Text("OPTIONS", size=30, color="black")
+        self.clockwise = ft.Switch()
+        self.reset_highscrore_label = ft.Text(f"RESET HIGHSCORE 0", size=16)
+        self.reset_highscrore = ft.ElevatedButton("RESET")
+        self.save_game = ft.ElevatedButton("SAVE")
+        self.load_game = ft.ElevatedButton("LOAD")
 
-    title = ft.Container(content=ft.Text("OPTIONS", size=30, color="black"), padding=10, alignment=ft.alignment.center)
-    clockwise = ft.Container(content=ft.Row([ft.Text("CLOCKWISE", size=16), ft.Switch()], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
-    reset_highscrore = ft.Container(content=ft.Row([ft.Text("RESET HIGHSCORE", size=16), ft.ElevatedButton("RESET")], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
-    save_game = ft.Container(content=ft.Row([ft.Text("SAVE GAME", size=16), ft.ElevatedButton("SAVE")], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
-    load_game = ft.Container(content=ft.Row([ft.Text("LOAD GAME", size=16), ft.ElevatedButton("LOAD")], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
-    credits_label = ft.Container(content=ft.Text("Autor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/", size=10, color="black"), )
 
-    options = ft.Column([title, clockwise, reset_highscrore, save_game, load_game], spacing=20)
+    def options_fn(self, container_width, container_height) -> ft.Column:
+        title = ft.Container(content=self.title, padding=10, alignment=ft.alignment.center)
 
-    options_credits = ft.Column([options, credits_label], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        clockwise = ft.Container(content=ft.Row([ft.Text("CLOCKWISE", size=16), self.clockwise], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
+        reset_highscrore = ft.Container(content=ft.Row([self.reset_highscrore_label, self.reset_highscrore], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
+        save_game = ft.Container(content=ft.Row([ft.Text("SAVE GAME", size=16), self.save_game], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
+        load_game = ft.Container(content=ft.Row([ft.Text("LOAD GAME", size=16), self.load_game], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
 
-    options_container = ft.Container(options_credits, width=ms.main_cont_width+150, height=ms.main_cont_height, bgcolor="#afb582", padding=10)
+        credits_label = ft.Container(content=ft.Text("Autor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/", size=10, color="black"), )
 
-    return options_container
+        options = ft.Column([title, clockwise, reset_highscrore, save_game, load_game], spacing=20)
 
-    # main_screen.controls[0] = options_container
-    # main_screen.controls.pop()
+        options_credits = ft.Column([options, credits_label], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
 
-# if __name__ == '__main__':
-#     def main(page: ft.Page):
-#         page.add(main_screen)
+        options_container = ft.Container(options_credits, width=container_width, height=container_height, bgcolor="#afb582", padding=10)
 
-#     ft.app(target=main)
+        return options_container
+
