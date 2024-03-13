@@ -5,7 +5,7 @@ from settings import *
 from buttons_layout import buttons_layout
 from main_screen import MainScreen
 from tetris import Game
-from options import options_fn
+from options import Options
 
 
 # Game screen layout 
@@ -14,13 +14,17 @@ main_screen = ms.background()
 main_screen_stack = main_screen.controls.copy()
 next_viewer = ms.next_tetromino_viewer()
 main_container = main_screen.controls[0].content
+
+# Game initialization
 tetris = Game()
-options = options_fn(ms)
+op = Options()
+options = op.options_fn(ms.main_cont_width+150, ms.main_cont_height)
+options_hiscore = options.content.controls[0].controls[2].content.controls[0].value
 
 # Initialization dashboard elements
 lcd_font = "LCD"
 hiscore_label = ft.Text(f"HI-SCORE", size=15, color="black")
-hiscore = ft.Text(f"{tetris.hiscore}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+hiscore = ft.Text(f"{tetris.hiscore_rw}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
 score_lable = ft.Text(f"SCORE", size=15, color="black")
 score = ft.Text(f"0", size=20, color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
 level_lable = ft.Text(f"LEVEL", size=15, color="black")
@@ -82,7 +86,7 @@ async def main(page: ft.Page):
     def update_dashboard():
         """Update the dashboard with the current game statistics including lines, level, score, delay, and speed."""
         global level, score, hiscore_label, hiscore
-        hiscore.value = f"{tetris.hiscore}"
+        hiscore.value = f"{tetris.hiscore_rw}"
         level.value = f"{tetris.level}"
         score.value = f"{tetris.score}"
         speed.value = f"{tetris.speed}"
@@ -219,16 +223,25 @@ async def main(page: ft.Page):
     async def settings(e):
         global main_screen_stack, main_screen
         if not e.control.selected:
+            # print(options.content.controls[0].controls[2].content.controls[0].value)
+            op.reset_highscrore_label.value = f"RESET HIGHSCORE {tetris.hiscore_rw}"
             main_screen_stack = main_screen.controls.copy()
             main_screen.controls[0] = options
-            main_screen.controls.pop()
+            main_screen.controls.pop() 
         else:
             main_screen.controls = main_screen_stack.copy()
         e.control.selected = not e.control.selected
         e.control.update()
         page.update()
         
+    def reset_highscrore(e):
+        tetris.hiscore_rw = 0
+        hiscore.value = 0
+        op.reset_highscrore_label.value = f"RESET HIGHSCORE {tetris.hiscore_rw}"
+        page.update()
 
+    # Option buttons
+    op.reset_highscrore.on_click = reset_highscrore
 
     # Buttons style
     func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(0), color="black", bgcolor="white", shadow_color="black", elevation=3)
