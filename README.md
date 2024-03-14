@@ -11,7 +11,8 @@ Flet version 0.21.1
 
 ### Desctop version
 
-![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_06.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_07.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_07a.png "Text to show on mouseover")
 
 
 
