@@ -30,4 +30,10 @@ FONTS = {"LCD": "fonts/LCD2N.TTF"}
 BTN_COLOR = ft.colors.YELLOW_600
 
 
+# OPTIONS LABELS
+OPTIONS_LABELS = ["CLOCKWISE", "RESET HIGHSCORE", "SAVE GAME", "LOAD GAME"]
+
+# FILES
+HIGHSCORE_FILE = "highscore.json"
+GAME_STATE_FILE = "game_state.json"
 

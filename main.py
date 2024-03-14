@@ -4,19 +4,27 @@ from settings import *
 from buttons_layout import buttons_layout
 from main_screen import MainScreen
 from tetris import Game
+from options import Options
+from datetime import datetime
 
 
 # Game screen layout 
 ms = MainScreen()
 main_screen = ms.background()
+main_screen_stack = main_screen.controls.copy()
 next_viewer = ms.next_tetromino_viewer()
 main_container = main_screen.controls[0].content
+
+# Game initialization
 tetris = Game()
+op = Options()
+options = op.options_fn(ms.main_cont_width+150, ms.main_cont_height)
+# options_hiscore = options.content.controls[0].controls[2].content.controls[0].value
 
 # Initialization dashboard elements
 lcd_font = "LCD"
 hiscore_label = ft.Text(f"HI-SCORE", size=15, color="black")
-hiscore = ft.Text(f"{tetris.hiscore}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+hiscore = ft.Text(f"{tetris.hiscore_rw}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
 score_lable = ft.Text(f"SCORE", size=15, color="black")
 score = ft.Text(f"0", size=20, color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
 level_lable = ft.Text(f"LEVEL", size=15, color="black")
@@ -27,7 +35,9 @@ next_label = ft.Text(f"NEXT", size=15, color="black")
 game_over_label = ft.Text("", size=15, color="black")
 
 
-async def main(page: ft.Page):    
+async def main(page: ft.Page):
+      
+
     def reset_screen(refresh=False) -> None:
         """
         Reset the screen with optional refresh.
@@ -75,8 +85,8 @@ async def main(page: ft.Page):
 
     def update_dashboard():
         """Update the dashboard with the current game statistics including lines, level, score, delay, and speed."""
-        global lines, level, score, delay, hiscore_label, hiscore
-        hiscore.value = f"{tetris.hiscore}"
+        global level, score, hiscore_label, hiscore
+        hiscore.value = f"{tetris.hiscore_rw}"
         level.value = f"{tetris.level}"
         score.value = f"{tetris.score}"
         speed.value = f"{tetris.speed}"
@@ -137,8 +147,9 @@ async def main(page: ft.Page):
         """
         clear_next_tetromino_field()
         tetris.inits()
-        reset_screen()
+        reset_screen(True)
         next_view(True, tetris)
+        page.update()
 
     async def rotate(e):
         """Rotates tetromino and updates screen."""
@@ -210,16 +221,69 @@ async def main(page: ft.Page):
             await right(e)
 
 
+    async def settings(e):
+        global main_screen_stack, main_screen
+        if not e.control.selected:
+            op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]}"
+            if tetris.date:
+                date_format = '%Y-%m-%d %H:%M:%S.%f'
+                date_obj = datetime.strptime(tetris.date, date_format)
+                op.save_game_label.value = f"{OPTIONS_LABELS[2]} {date_obj.strftime('%d.%m.%y %H:%M')}"
+            
+            main_screen_stack = main_screen.controls.copy()
+            main_screen.controls[0] = options
+            main_screen.controls.pop() 
+        else:
+            main_screen.controls = main_screen_stack.copy()
+        e.control.selected = not e.control.selected
+        e.control.update()
+        page.update()
+        
+    def reset_highscrore(e):
+        tetris.hiscore_rw = 0
+        hiscore.value = 0
+        op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
+        page.update()
+
+    def save_game(e):
+        if tetris.save_game():
+            op.save_game_label.value = f"{OPTIONS_LABELS[2]} - (Game saved)"
+            page.update()
+        
+    def load_game(e):
+        if tetris.load_game():
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]} - (Game loaded)"
+            reset_screen(True)
+            page.update()
+
+    def clockwise(e):
+        if e.control.value:
+            tetris.rotate_direction = 1
+        else:
+            tetris.rotate_direction = -1
+        print(tetris.rotate_direction)
+
+    # Option buttons
+    op.reset_highscrore.on_click = reset_highscrore
+    op.save_game.on_click = save_game
+    op.load_game.on_click = load_game
+    op.clockwise.on_change = clockwise
+    
 
     # Buttons style
-    func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(10), color="black", bgcolor="white", shadow_color="black", elevation=3)
+    func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(0), color="black", bgcolor="white", shadow_color="black", elevation=3)
     direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
     rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
 
     # Buttons
+    options_btn = ft.IconButton(icon=ft.icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
+
     start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"))
-    restart_btn = ft.ElevatedButton("R", on_click=restart, style=func_btn_style)
-    func_buttons = [start_btn, restart_btn]
+    
+    restart_btn = ft.IconButton(icon=ft.icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
+    func_buttons = [start_btn, options_btn, restart_btn]
+
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
     left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long, style=direction_btn_style)
     right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long, style=direction_btn_style)

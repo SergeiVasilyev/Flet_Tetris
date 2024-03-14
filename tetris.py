@@ -1,7 +1,8 @@
+from datetime import datetime
 import random
 from tetrominoes import TETROMINOES, EL_T, EL_L, EL_J, EL_O, EL_I, EL_S, EL_Z
 from settings import *
-from data_rw import read_score, save_score
+from data_rw import load_data, save_data
 
 
 class Block:
@@ -31,12 +32,12 @@ class Tetromino:
                 return False
         return True
 
-    def rotate(self, back=False) -> int:
+    def rotate(self, back=False, rotate_direction=1) -> int:
         """Rotate the orientation of the object by 90 degrees in the specified direction.
         :param back: a boolean indicating whether to rotate in the opposite direction (default is False)
         :return: the new orientation value after rotation
         """
-        direction = 1 if back else -1
+        direction = 1 * rotate_direction if back else -1 * rotate_direction
         self.orientation = (self.orientation + direction) % 4
         return self.orientation
 
@@ -84,12 +85,14 @@ class Game:
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
         self.next_tetromino = self.tetromino_generator.get_next_tetromino()
-        self.hiscore = self.read_hiscore
+        self.hiscore = self.hiscore_rw
+        self._date = None
         self.lines = 0
         self.score = 0
         self.level = 1
         self.delay = 1
         self.speed = 1
+        self.rotate_direction = 1
 
 
     def inits(self):
@@ -97,15 +100,70 @@ class Game:
 
 
     @property
-    def read_hiscore(self) -> int:
+    def hiscore_rw(self) -> int:
         """
         This function is a property method that returns the highest score from the read_score object. 
         It does not take any parameters and returns an integer value representing the highest score, or 0 if the read_score object is empty.
         """
-        obj = read_score()
-        return obj['score'] if obj else 0
-
+        # obj = read_score()
+        obj = load_data(HIGHSCORE_FILE)
+        try:
+            score = obj['score']
+        except:
+            score = 0
+        return score
     
+    @hiscore_rw.setter
+    def hiscore_rw(self, score):
+        # save_score('Tetris', score)
+        obj = {
+            'name': 'Tetris',
+            'score': score,
+            'date': f"{datetime.now()}"
+        }
+        save_data(HIGHSCORE_FILE, obj)
+
+    @property
+    def date(self):
+        return self._date
+    
+    @date.setter
+    def date(self, val):
+        self._date = val
+    
+    def save_game(self):
+        self.date = str(datetime.now())
+        obj = {
+            "date": self.date,
+            "board": self.board,
+            "score": self.score,
+            "level": self.level,
+            "lines": self.lines,
+            "delay": self.delay,
+            "speed": self.speed,
+            "direction": self.rotate_direction
+        }
+        if save_data(GAME_STATE_FILE, obj):
+            return True
+        else:
+            return False
+        
+    
+    def load_game(self):
+        obj = load_data(GAME_STATE_FILE)
+        try:
+            self.date = obj['date']
+            self.board = obj['board']
+            self.score = obj['score']
+            self.level = obj['level']
+            self.lines = obj['lines']
+            self.delay = obj['delay']
+            self.speed = obj['speed']
+            self.status = Status.RUNNING
+            return True
+        except:
+            return False
+
     def new_tetromino(self) -> None:
         """
         Creates a new tetromino and sets its initial row to -1. 
@@ -171,14 +229,14 @@ class Game:
 
     def rotate(self):
         """Rotate the current tetromino and adjust its position to avoid collisions."""
-        self.current_tetromino.rotate()
+        self.current_tetromino.rotate(back=False, rotate_direction=self.rotate_direction)
         if not self.collision_check([self.bottom_condition, self.board_condition]):
             while self.collision_check([self.left_condition]):
                 self.current_tetromino.col += 1
             while self.collision_check([self.right_condition]):
                 self.current_tetromino.col -= 1
         else:
-            self.current_tetromino.rotate(back=True)
+            self.current_tetromino.rotate(back=True, rotate_direction=self.rotate_direction)
 
     def dropped(self):
         """Update board and score after a piece has been dropped."""
@@ -200,7 +258,13 @@ class Game:
         
         # Update the high score
         if self.score > self.hiscore:
-            save_score('Tetris', self.score)
+            # save_score('Tetris', self.score)
+            obj = {
+                'name': 'Tetris',
+                'score': self.score,
+                'date': f"{datetime.now()}"
+            }
+            save_data(HIGHSCORE_FILE, obj)
             self.hiscore = self.score
         
     
