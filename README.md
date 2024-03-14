@@ -7,7 +7,8 @@ Flet version 0.21.1
 
 ### Mobile version
 
-![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_mobile_02-800.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_mobile_03-800.png "Text to show on mouseover")
+![alt text for screen readers](https://github.com/SergeiVasilyev/Flet_Tetris/blob/main/Doc/pics/Screen_mobile_03a-800.png "Text to show on mouseover")
 
 ### Desctop version
 
