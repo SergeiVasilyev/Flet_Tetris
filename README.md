@@ -44,10 +44,6 @@ More information here: https://flet.dev/docs/guides/python/packaging-app-for-dis
 
 
 ## TODO
-
-- Reset highscore
-- Game saving
-- Options (Color, Clockwise)
 - Hotkeys for desctop version
 
 
