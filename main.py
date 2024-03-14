@@ -1,11 +1,11 @@
 import asyncio
-import copy
 import flet as ft
 from settings import *
 from buttons_layout import buttons_layout
 from main_screen import MainScreen
 from tetris import Game
 from options import Options
+from datetime import datetime
 
 
 # Game screen layout 
@@ -147,8 +147,9 @@ async def main(page: ft.Page):
         """
         clear_next_tetromino_field()
         tetris.inits()
-        reset_screen()
+        reset_screen(True)
         next_view(True, tetris)
+        page.update()
 
     async def rotate(e):
         """Rotates tetromino and updates screen."""
@@ -224,6 +225,12 @@ async def main(page: ft.Page):
         global main_screen_stack, main_screen
         if not e.control.selected:
             op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]}"
+            if tetris.date:
+                date_format = '%Y-%m-%d %H:%M:%S.%f'
+                date_obj = datetime.strptime(tetris.date, date_format)
+                op.save_game_label.value = f"{OPTIONS_LABELS[2]} {date_obj.strftime('%d.%m.%y %H:%M')}"
+            
             main_screen_stack = main_screen.controls.copy()
             main_screen.controls[0] = options
             main_screen.controls.pop() 
@@ -239,8 +246,30 @@ async def main(page: ft.Page):
         op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
         page.update()
 
+    def save_game(e):
+        if tetris.save_game():
+            op.save_game_label.value = f"{OPTIONS_LABELS[2]} - (Game saved)"
+            page.update()
+        
+    def load_game(e):
+        if tetris.load_game():
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]} - (Game loaded)"
+            reset_screen(True)
+            page.update()
+
+    def clockwise(e):
+        if e.control.value:
+            tetris.rotate_direction = 1
+        else:
+            tetris.rotate_direction = -1
+        print(tetris.rotate_direction)
+
     # Option buttons
     op.reset_highscrore.on_click = reset_highscrore
+    op.save_game.on_click = save_game
+    op.load_game.on_click = load_game
+    op.clockwise.on_change = clockwise
+    
 
     # Buttons style
     func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(0), color="black", bgcolor="white", shadow_color="black", elevation=3)
