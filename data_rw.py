@@ -1,23 +1,22 @@
 import json
 
 
-def save_score(name, score):
-    obj = {
-        'name': name,
-        'score': score
-    }
-    json_obj = json.dumps(obj, indent=4)
+def save_data(filename, data):
+    json_obj = json.dumps(data, indent=4)
     try:
-        with open('highscore.json', 'w') as f:
+        with open(filename, 'w') as f:
             f.write(json_obj)
+        return True
     except:
         return None
-
-
-def read_score():
+    
+def load_data(filename):
     try:
-        with open('highscore.json', 'r') as f:
+        with open(filename, 'r') as f:
             obj = json.load(f)
+        return obj
     except:
         return None
-    return obj
+    
+    
+
