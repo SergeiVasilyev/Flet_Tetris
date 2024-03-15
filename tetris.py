@@ -105,7 +105,6 @@ class Game:
         This function is a property method that returns the highest score from the read_score object. 
         It does not take any parameters and returns an integer value representing the highest score, or 0 if the read_score object is empty.
         """
-        # obj = read_score()
         obj = load_data(HIGHSCORE_FILE)
         try:
             score = obj['score']
@@ -115,7 +114,7 @@ class Game:
     
     @hiscore_rw.setter
     def hiscore_rw(self, score):
-        # save_score('Tetris', score)
+        """Setter function for updating the high score in the game."""
         obj = {
             'name': 'Tetris',
             'score': score,
@@ -131,7 +130,13 @@ class Game:
     def date(self, val):
         self._date = val
     
-    def save_game(self):
+    def save_game(self) -> bool:
+        """
+        Save the current game state to a file, including date, board, score, level, lines, delay, speed, and rotation direction.
+
+        Returns:
+            bool: True if the game state was successfully saved, False otherwise.
+        """
         self.date = str(datetime.now())
         obj = {
             "date": self.date,
@@ -149,7 +154,12 @@ class Game:
             return False
         
     
-    def load_game(self):
+    def load_game(self) -> bool:
+        """
+        Load the game state from a file and update the game object with the loaded data.
+
+        :return: True if the game state was successfully loaded and updated, False otherwise
+        """
         obj = load_data(GAME_STATE_FILE)
         try:
             self.date = obj['date']
@@ -270,6 +280,7 @@ class Game:
     
 
     def clear_full_lines(self):
+        """Clears full lines in the game board and updates the score, lines, level, delay, and speed accordingly."""
         lines = 0
         for y in range(BOARD_HEIGHT):
             if sum(self.board[y]) == BOARD_WIDTH:

@@ -5,6 +5,7 @@ from settings import *
 
 
 class Options:
+    """A class to handle game options."""
     def __init__(self) -> None:
         self.title = ft.Text("OPTIONS", size=30, color="black")
         self.clockwise_label = ft.Text(f"{OPTIONS_LABELS[0]}", size=16)
@@ -18,6 +19,7 @@ class Options:
 
 
     def options_fn(self, container_width, container_height) -> ft.Column:
+        """Generate a column layout for the options menu with the specified container width and height. Return the options container."""
         title = ft.Container(content=self.title, padding=10, alignment=ft.alignment.center)
 
         clockwise = ft.Container(content=ft.Row([self.clockwise_label, self.clockwise], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))

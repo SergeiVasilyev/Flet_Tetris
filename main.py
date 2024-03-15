@@ -222,6 +222,7 @@ async def main(page: ft.Page):
 
 
     async def settings(e):
+        """A function to handle settings changes and update the main screen accordingly."""
         global main_screen_stack, main_screen
         if not e.control.selected:
             op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
@@ -239,32 +240,44 @@ async def main(page: ft.Page):
         e.control.selected = not e.control.selected
         e.control.update()
         page.update()
+
         
     def reset_highscrore(e):
+        """Resets the highscore"""
         tetris.hiscore_rw = 0
         hiscore.value = 0
         op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
         page.update()
 
     def save_game(e):
+        """A function that saves the game"""
         if tetris.save_game():
-            op.save_game_label.value = f"{OPTIONS_LABELS[2]} - (Game saved)"
+            op.save_game_label.value = f"{OPTIONS_LABELS[2]} - Game saved"
             page.update()
+        else:
+            op.save_game_label.value = f"{OPTIONS_LABELS[2]} - Failed to save"
+            page.update()
+
         
     def load_game(e):
+        """A function that loads the saved game"""
         if tetris.load_game():
-            op.load_game_label.value = f"{OPTIONS_LABELS[3]} - (Game loaded)"
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]} - Game loaded"
             reset_screen(True)
+            page.update()
+        else:
+            op.load_game_label.value = f"{OPTIONS_LABELS[3]} - Game not found"
             page.update()
 
     def clockwise(e):
+        """A function to set the rotation direction"""
         if e.control.value:
             tetris.rotate_direction = 1
         else:
             tetris.rotate_direction = -1
-        print(tetris.rotate_direction)
 
-    # Option buttons
+
+    # Option buttons.
     op.reset_highscrore.on_click = reset_highscrore
     op.save_game.on_click = save_game
     op.load_game.on_click = load_game
