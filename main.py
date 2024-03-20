@@ -1,5 +1,4 @@
 import asyncio
-import time
 import flet as ft
 from settings import *
 from buttons_layout import buttons_layout
