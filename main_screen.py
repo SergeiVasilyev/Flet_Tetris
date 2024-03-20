@@ -18,7 +18,7 @@ class MainScreen():
         main_container = ft.GridView(expand=True, max_extent=BOX_WIDTH, child_aspect_ratio=1, spacing=self.main_cont_padding, run_spacing=self.main_cont_padding, padding=0)
 
         main_screen_row = ft.Row([
-            ft.Container(main_container, width=self.main_cont_width, padding=self.main_cont_padding, bgcolor="#afb582"), 
+            ft.Container(main_container, width=self.main_cont_width, padding=self.main_cont_padding, bgcolor="#afb582",), 
             sidebar],
             alignment=ft.MainAxisAlignment.CENTER,
             spacing=0,
@@ -26,7 +26,7 @@ class MainScreen():
         )
         
         stack2 = ft.Stack()
-        stack2.controls = [ft.Container(width=INNER_BOX_WIDTH, height=INNER_BOX_HEIGHT, bgcolor=MUTE_COLOR, border_radius=BOX_BORDER_RADIUS)]
+        stack2.controls = [ft.Container(width=INNER_BOX_WIDTH, height=INNER_BOX_HEIGHT, bgcolor=MUTE_COLOR, border_radius=BOX_BORDER_RADIUS) ]
 
         for _ in range(200):
             main_container.controls.append(
@@ -34,7 +34,7 @@ class MainScreen():
                     alignment=ft.alignment.center,
                     border=ft.border.all(2, MUTE_COLOR),
                     border_radius=ft.border_radius.all(BOX_BORDER_RADIUS),
-                    content=copy.deepcopy(stack2)
+                    content=copy.deepcopy(stack2),
                 )
             )
 

@@ -92,18 +92,22 @@ async def main(page: ft.Page):
         score.value = f"{tetris.score}"
         speed.value = f"{tetris.speed}"
 
+    async def clear_lines(f, y) -> None:
+        for x in f:
+            xx = x if y % 2 == 0 else 9 - x # Reverse the x value if the line is even
+            c = y*10+xx
+            main_container.controls[c].border = ft.border.all(2, MUTE_COLOR)
+            main_container.controls[c].content.controls[0].bgcolor = MUTE_COLOR
+            main_screen.update()
+            await asyncio.sleep(0.001)
 
     async def filled_line_animation(lines) -> None:
-        """Filled Line Animation"""
-        f = [_ for _ in range(9, -1, -1)]
+        """Filled Line Animation"""        
+        # f = [_ for _ in range(9, -1, -1)]
+        f = list(range(9, -1, -1))
         if lines:
-            for x in f:
-                for y in lines:
-                    xx = x if y % 2 == 0 else 9 - x # Reverse the x value if the line is even
-                    main_container.controls[y*10+xx].border = ft.border.all(2, MUTE_COLOR)
-                    main_container.controls[y*10+xx].content.controls[0].bgcolor = MUTE_COLOR
-                    main_screen.update()
-                await asyncio.sleep(0.01)
+            tasks = [clear_lines(f, y) for y in lines]
+            await asyncio.gather(*tasks)
 
 
     async def set_dropped_and_update(wait=0.05) -> None:
@@ -121,8 +125,6 @@ async def main(page: ft.Page):
                 tetris.new_tetromino() # Generate new tetromino and reset tetromino row to -1
                 update_dashboard() # update the dashboard
                 next_tetromino_show_hide(True, tetris) # show next tetromino on the dashboard
-                print(tetris.board)
-                print(tetris.delete_full_lines_list)
                 await filled_line_animation(tetris.delete_full_lines_list)
                 refresh_screen(refresh=True) # refresh the screen
                 
