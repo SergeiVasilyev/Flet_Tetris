@@ -38,19 +38,21 @@ game_over_label = ft.Text("", size=15, color="black")
 async def main(page: ft.Page):
       
 
-    def reset_screen(refresh=False) -> None:
+    def refresh_screen(refresh=False) -> None:
         """
         Reset the screen with optional refresh.
         :param refresh: boolean, optional, whether to refresh the screen
         """
         for y in range(20):
             for x in range(10):
-                color = BRIGHT_COLOR if refresh and tetris.board[y][x] == 1 else MUTE_COLOR
+                # If the block is filled on the board or if the block is part of the current tetromino, show it in bright color
+                color = BRIGHT_COLOR if refresh and tetris.board[y][x] == 1 or any(block.y == y and block.x == x for block in tetris.current_tetromino.shape()) else MUTE_COLOR
                 main_container.controls[y*10+x].border = ft.border.all(2, color)
                 main_container.controls[y*10+x].content.controls[0].bgcolor = color
+        main_screen.update()
         
 
-    def board_update(is_show, tetris) -> None:
+    def tetromino_show_hide(is_show, tetris) -> None:
         """
         Update the board with the current tetromino's shape by changing the border and background color of the corresponding controls. 
 
@@ -63,17 +65,16 @@ async def main(page: ft.Page):
                 if block.y >= 0 and block.y <= 20:
                     main_container.controls[block.y * 10 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                     main_container.controls[block.y * 10 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
-
-    def next_view(is_show, tetris) -> None:
-        """
-        Function to update the next tetromino view based on the provided visibility flag and tetris state.
+        
+    def next_tetromino_show_hide(is_show, tetris) -> None:
+        """Function to update the next tetromino view based on the provided visibility flag and tetris state.
 
         :param is_show: bool - Flag to indicate whether to show the next tetromino view
         :param tetris: Tetris - The tetris state object
         """
-        next_tetromino = tetris.next_tetromino
-        if next_tetromino:
-            for block in next_tetromino.shape():
+        shape_or_board = tetris.next_tetromino.shape() if is_show else tetris.next_tetromino_board
+        if shape_or_board:
+            for block in shape_or_board:
                 next_viewer.content.controls[block.y * 4 + block.x].border = ft.border.all(2, BRIGHT_COLOR if is_show else MUTE_COLOR)
                 next_viewer.content.controls[block.y * 4 + block.x].content.controls[0].bgcolor = BRIGHT_COLOR if is_show else MUTE_COLOR
 
@@ -90,26 +91,53 @@ async def main(page: ft.Page):
         level.value = f"{tetris.level}"
         score.value = f"{tetris.score}"
         speed.value = f"{tetris.speed}"
+        
+
+    async def clear_lines(line, color, l) -> None:
+        """Asynchronously clears lines on the main container with a specified color.
+        :param line: The line number to clear.
+        :param color: The color to use for clearing.
+        :param l: Quantity of lines
+        """
+        for x in range(10):
+            main_container.controls[line*10+x].border = ft.border.all(2, color)
+            main_container.controls[line*10+x].content.controls[0].bgcolor = color
+        main_screen.update()
+        await asyncio.sleep(0.06 / l)
+            
+
+    async def filled_line_animation(lines) -> None:
+        """Asynchronously animates the filled lines on the screen.
+        Args:
+            lines (List[int]): A list of line numbers to animate.
+        """
+        if lines:
+            color = BRIGHT_COLOR
+            for _ in range(2):
+                color = MUTE_COLOR if color == BRIGHT_COLOR else BRIGHT_COLOR
+                tasks = [clear_lines(line, color, len(lines)) for line in lines]
+                await asyncio.gather(*tasks)
 
 
-    async def set_dropped_and_update(wait=0.5):
+    async def set_dropped_and_update(wait=0.05) -> None:
         """
         An asynchronous function that sets the dropped state of the tetromino in the Tetris game. 
-        It takes an optional 'wait' parameter with a default value of 0.5. 
+        It takes an optional 'wait' parameter with a default value of 0.05. 
         This function performs collision checks to determine if the tetromino can move, and if not, 
         it drops the tetromino, generates a new one, and updates the dashboard. 
         """
         if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): 
             await asyncio.sleep(wait) # last chance to move tetromino
             if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1): # check again if tetromino can move
-                next_view(False, tetris) # hide next tetromino on the dashboard
+                next_tetromino_show_hide(False, tetris) # hide next tetromino on the dashboard
                 tetris.dropped() # drop the tetromino
                 tetris.new_tetromino() # Generate new tetromino and reset tetromino row to -1
-            reset_screen(True) # refresh the screen
-            update_dashboard() # update the dashboard
-            next_view(True, tetris) # show next tetromino on the dashboard
-            
-            
+                update_dashboard() # update the dashboard
+                next_tetromino_show_hide(True, tetris) # show next tetromino on the dashboard
+                await filled_line_animation(tetris.delete_full_lines_list)
+                refresh_screen(refresh=True) # refresh the screen
+                
+  
     async def game(e):
         """An asynchronous function that controls the game flow, 
         including initialization, updating the dashboard, and handling game over and pause states.
@@ -117,18 +145,19 @@ async def main(page: ft.Page):
         game_over_label.value = ""
         if tetris.status != 1: # if game is not running
             if tetris.next_tetromino:
-                next_view(False, tetris)
+                next_tetromino_show_hide(False, tetris)
             tetris.inits()
-            reset_screen()
+            refresh_screen()
             update_dashboard()
-            next_view(True, tetris)
+            next_tetromino_show_hide(True, tetris)
         
         # while game is running and not paused
         while e.control.selected:
             start_btn.label = ft.Text('Pause', color="black")
             await down_step(delay=tetris.delay)
+
             if tetris.status == 2: # if game is over
-                reset_screen()
+                refresh_screen()
                 start_btn.selected = False
                 start_btn.label = ft.Text('Start', color="black")
                 page.update()
@@ -147,68 +176,71 @@ async def main(page: ft.Page):
         """
         clear_next_tetromino_field()
         tetris.inits()
-        reset_screen(True)
-        next_view(True, tetris)
+        refresh_screen(True)
+        next_tetromino_show_hide(True, tetris)
         page.update()
+
 
     async def rotate(e):
         """Rotates tetromino and updates screen."""
-        board_update(False, tetris)
+        tetromino_show_hide(False, tetris)
         tetris.rotate()
-        board_update(True, tetris)
+        tetromino_show_hide(True, tetris)
         page.update()
+
 
     async def left(e):
         """Moves tetromino to the left and updates screen."""
-        if tetris.current_tetromino.row >= 0:
-            board_update(False, tetris)
-        
+        tetromino_show_hide(False, tetris)
         tetris.left()
-        board_update(True, tetris)
+        tetromino_show_hide(True, tetris)
         page.update()
+
 
     async def right(e):
         """Moves tetromino to the right and updates screen."""
-        if tetris.current_tetromino.row >= 0:
-            board_update(False, tetris)
-        
+        tetromino_show_hide(False, tetris)
         tetris.right()
-        board_update(True, tetris)
+        tetromino_show_hide(True, tetris)
         page.update()
+
 
     async def down_step(delay):
         """
         Asynchronously moves the current tetromino down, and delays the next action.
         :param delay: The time delay in seconds before the next action.
         """
-        if tetris.current_tetromino.row != -1:
-            board_update(False, tetris)
-        tetris.down()
-        board_update(True, tetris)
-        page.update()
+        await down(None)
         await asyncio.sleep(delay) # Main delay
-        await set_dropped_and_update()
  
  
     async def drop(e):
         """Drops the current tetromino."""
-        board_update(False, tetris)
+        tetromino_show_hide(False, tetris)
         while not tetris.current_tetromino.row < 0:
             tetris.down()
             if tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
-                board_update(True, tetris)
-                await set_dropped_and_update()
+                tetromino_show_hide(True, tetris)
+                await set_dropped_and_update(wait=0.03)
                 break
-        page.update()
+        main_screen.update()
 
     async def down(e):
         """Moves the current tetromino down."""
-        await down_step(delay=0)
+        await set_dropped_and_update()
+        if not tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
+            tetromino_show_hide(False, tetris)
+        tetris.down()
+        tetromino_show_hide(True, tetris)
+        main_screen.update()
+
 
     async def down_long(e):
         """Moves the current tetromino down if button is held."""
-        while not tetris.current_tetromino.row <= 0:
-            await down_step(delay=0)
+        while not tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
+            await asyncio.sleep(0)
+            await down(e)
+            
 
     async def left_long(e):
         """Moves the current tetromino to the left if button is held."""
@@ -263,7 +295,7 @@ async def main(page: ft.Page):
         """A function that loads the saved game"""
         if tetris.load_game():
             op.load_game_label.value = f"{OPTIONS_LABELS[3]} - Game loaded"
-            reset_screen(True)
+            refresh_screen(True)
             page.update()
         else:
             op.load_game_label.value = f"{OPTIONS_LABELS[3]} - Game not found"

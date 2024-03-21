@@ -83,6 +83,7 @@ class Game:
         self.status = status
         self.tetromino_generator = TetrominoGenerator()
         self.board = [[0] * BOARD_WIDTH for _ in range(BOARD_HEIGHT)]
+        self.next_tetromino_board = [Block(x, y) for x in range(4) for y in range(2)]
         self.current_tetromino = self.tetromino_generator.add_next_tetromino()
         self.next_tetromino = self.tetromino_generator.get_next_tetromino()
         self.hiscore = self.hiscore_rw
@@ -93,6 +94,7 @@ class Game:
         self.delay = 1
         self.speed = 1
         self.rotate_direction = 1
+        self.delete_full_lines_list = []
 
 
     def inits(self):
@@ -251,7 +253,7 @@ class Game:
     def dropped(self):
         """Update board and score after a piece has been dropped."""
         
-        if not self.current_tetromino.is_shape_inside_board():
+        if not self.current_tetromino.is_shape_inside_board() and self.current_tetromino.row > 0:
             raise ValueError("Tetromino is out of the board")
         
         # Set the current tetromino to the board
@@ -282,11 +284,13 @@ class Game:
     def clear_full_lines(self):
         """Clears full lines in the game board and updates the score, lines, level, delay, and speed accordingly."""
         lines = 0
+        self.delete_full_lines_list = []
         for y in range(BOARD_HEIGHT):
             if sum(self.board[y]) == BOARD_WIDTH:
                 self.board.pop(y)
                 self.board.insert(0, [0] * BOARD_WIDTH)
                 lines += 1
+                self.delete_full_lines_list.append(y)
                               
         self.lines += lines
         self.score += 100 * lines**2 + ((self.level-1) * 10) 

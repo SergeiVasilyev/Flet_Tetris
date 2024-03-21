@@ -27,7 +27,7 @@ class Options:
         save_game = ft.Container(content=ft.Row([self.save_game_label, self.save_game], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
         load_game = ft.Container(content=ft.Row([self.load_game_label, self.load_game], alignment=ft.MainAxisAlignment.SPACE_BETWEEN))
 
-        credits_label = ft.Container(content=ft.Text("Autor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/", size=10, color="black"), )
+        credits_label = ft.Container(content=ft.Text("Version: 1.0.1alpha, \nAutor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/", size=10, color="black"), )
 
         options = ft.Column([title, clockwise, reset_highscrore, save_game, load_game], spacing=20)
 
