@@ -92,21 +92,37 @@ async def main(page: ft.Page):
         score.value = f"{tetris.score}"
         speed.value = f"{tetris.speed}"
 
-    async def clear_lines(f, y) -> None:
-        for x in f:
-            xx = x if y % 2 == 0 else 9 - x # Reverse the x value if the line is even
-            c = y*10+xx
-            main_container.controls[c].border = ft.border.all(2, MUTE_COLOR)
-            main_container.controls[c].content.controls[0].bgcolor = MUTE_COLOR
+    # async def clear_lines(f, y) -> None:
+    #     for x in f:
+    #         xx = x if y % 2 == 0 else 9 - x # Reverse the x value if the line is even
+    #         c = y*10+xx
+    #         main_container.controls[c].border = ft.border.all(2, MUTE_COLOR)
+    #         main_container.controls[c].content.controls[0].bgcolor = MUTE_COLOR
+    #         main_screen.update()
+    #         await asyncio.sleep(0.001)
+
+    # async def filled_line_animation(lines) -> None:
+    #     """Filled Line Animation"""        
+    #     # f = [_ for _ in range(9, -1, -1)]
+    #     f = list(range(9, -1, -1))
+    #     if lines:
+    #         tasks = [clear_lines(f, y) for y in lines]
+    #         await asyncio.gather(*tasks)
+
+    async def clear_lines(line) -> None:
+        color = BRIGHT_COLOR
+        for _ in range(4):
+            color = MUTE_COLOR if color == BRIGHT_COLOR else BRIGHT_COLOR
+            for x in range(10):
+                main_container.controls[line*10+x].border = ft.border.all(2, color)
+                main_container.controls[line*10+x].content.controls[0].bgcolor = color
             main_screen.update()
-            await asyncio.sleep(0.001)
+            await asyncio.sleep(0.13)
+            
 
     async def filled_line_animation(lines) -> None:
-        """Filled Line Animation"""        
-        # f = [_ for _ in range(9, -1, -1)]
-        f = list(range(9, -1, -1))
         if lines:
-            tasks = [clear_lines(f, y) for y in lines]
+            tasks = [clear_lines(line) for line in lines]
             await asyncio.gather(*tasks)
 
 
