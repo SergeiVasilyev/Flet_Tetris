@@ -389,7 +389,7 @@ async def main(page: ft.Page):
             await rotate(e)
         if e.key == "R":
             restart(e)
-        if e.key == "E":
+        if e.key == "E" or e.key == "P":
             e.control.selected = not e.control.selected
             start_btn.leading = ft.Icon(ft.icons.CHECK) if e.control.selected else None
             start_btn.update()
