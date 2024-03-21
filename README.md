@@ -42,4 +42,13 @@ flet build apk
 ```
 More information here: https://flet.dev/docs/guides/python/packaging-app-for-distribution
 
-
+## Hotkeys
+```
+Start / Pause - 'E' or 'P'
+Restart - 'R'
+Settings - 'Escape' or 'Backspace'
+Left - 'A' or 'Arrow Left'
+Right - 'D' or 'Arrow Right'
+Up - 'W' or 'Arrow Up'
+Down - 'S' or 'Arrow Down'
+```
