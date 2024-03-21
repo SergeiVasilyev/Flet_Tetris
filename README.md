@@ -43,7 +43,3 @@ flet build apk
 More information here: https://flet.dev/docs/guides/python/packaging-app-for-distribution
 
 
-## TODO
-- Hotkeys for desctop version
-
-
