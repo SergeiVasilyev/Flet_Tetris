@@ -372,6 +372,31 @@ async def main(page: ft.Page):
         alignment=ft.MainAxisAlignment.CENTER,
     )
 
+    async def keyboard(e: ft.KeyboardEvent):
+        if 'selected' not in dir(e.control):
+            e.control.selected = False
+        if e.key == "Escape" or e.key == "Backspace":
+            await settings(e)
+        if e.key == "A" or e.key == "Arrow Left":
+            await left(e)
+        if e.key == "D" or e.key == "Arrow Right":
+            await right(e)
+        if e.key == "S" or e.key == "Arrow Down":
+            await down(e)
+        if e.key == "W" or e.key == "Arrow Up":
+            await drop(e)
+        if e.key == "F" or e.key == "Numpad 0":
+            await rotate(e)
+        if e.key == "R":
+            restart(e)
+        if e.key == "E":
+            e.control.selected = not e.control.selected
+            start_btn.leading = ft.Icon(ft.icons.CHECK) if e.control.selected else None
+            start_btn.update()
+            await game(e)
+
+    page.on_keyboard_event = keyboard
+
     # Page view settings
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
