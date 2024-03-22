@@ -152,15 +152,17 @@ async def main(page: ft.Page):
             next_tetromino_show_hide(True, tetris)
         
         # while game is running and not paused
-        while e.control.selected:
+        while start_btn.selected:
             start_btn.label = ft.Text('Pause', color="black")
+            start_btn.selected = True
+            start_btn.update()
             await down_step(delay=tetris.delay)
 
             if tetris.status == 2: # if game is over
                 refresh_screen()
                 start_btn.selected = False
                 start_btn.label = ft.Text('Start', color="black")
-                page.update()
+                start_btn.update()
                 tetris.status == 0
         else:
             start_btn.label = ft.Text('Start', color="black")
@@ -373,8 +375,6 @@ async def main(page: ft.Page):
     )
 
     async def keyboard(e: ft.KeyboardEvent):
-        if 'selected' not in dir(e.control):
-            e.control.selected = False
         if e.key == "Escape" or e.key == "Backspace":
             await settings(e)
         if e.key == "A" or e.key == "Arrow Left":
@@ -390,8 +390,7 @@ async def main(page: ft.Page):
         if e.key == "R":
             restart(e)
         if e.key == "E" or e.key == "P":
-            e.control.selected = not e.control.selected
-            start_btn.leading = ft.Icon(ft.icons.CHECK) if e.control.selected else None
+            start_btn.selected = not start_btn.selected
             start_btn.update()
             await game(e)
 
