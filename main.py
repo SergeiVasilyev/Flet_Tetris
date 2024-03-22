@@ -169,7 +169,6 @@ async def main(page: ft.Page):
         else:
             start_btn.label = ft.Text('Start', color="black")
             game_over_label.value = "PAUSE" if tetris.status == 1 else "GAME OVER"
-            block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             page.update()
         
 
