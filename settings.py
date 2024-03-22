@@ -37,3 +37,4 @@ OPTIONS_LABELS = ["ROTATE CLOCKWISE", "RESET HIGH SCORE", "SAVE GAME", "LOAD GAM
 HIGHSCORE_FILE = "highscore.json"
 GAME_STATE_FILE = "game_state.json"
 
+CREDITS_TEXT = "Version: 1.0.2alpha, \nAutor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/"
