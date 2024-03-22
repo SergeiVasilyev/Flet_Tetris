@@ -16,10 +16,10 @@ def buttons_layout(func_buttons, directions) -> ft.Column:
     up_btn, left_btn, right_btn, drop_btn, rotate_btn = directions
     
     # Func buttons
-    func_buttons = ft.Row([*func_buttons], alignment=ft.MainAxisAlignment.END, spacing=10)
+    func_buttons = ft.Row([*func_buttons], alignment=ft.MainAxisAlignment.END, spacing=20)
     func_buttons_container = ft.Container(
         content=func_buttons,
-        padding=ft.Padding(0, 0, 30, 0),
+        padding=ft.Padding(0, 0, 50, 0),
     )
 
     # Direction buttons
