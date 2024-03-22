@@ -137,7 +137,7 @@ async def main(page: ft.Page):
                 await filled_line_animation(tetris.delete_full_lines_list)
                 refresh_screen(refresh=True) # refresh the screen
                 
-  
+
     async def game(e):
         """An asynchronous function that controls the game flow, 
         including initialization, updating the dashboard, and handling game over and pause states.
@@ -153,12 +153,14 @@ async def main(page: ft.Page):
         
         # while game is running and not paused
         while start_btn.selected:
+            block_buttons(disable_direction_buttons=False, disable_function_buttons=False)
             start_btn.label = ft.Text('Pause', color="black")
             start_btn.selected = True
             start_btn.update()
             await down_step(delay=tetris.delay)
 
             if tetris.status == 2: # if game is over
+                block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
                 refresh_screen()
                 start_btn.selected = False
                 start_btn.label = ft.Text('Start', color="black")
@@ -167,6 +169,7 @@ async def main(page: ft.Page):
         else:
             start_btn.label = ft.Text('Start', color="black")
             game_over_label.value = "PAUSE" if tetris.status == 1 else "GAME OVER"
+            block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             page.update()
         
 
@@ -254,11 +257,33 @@ async def main(page: ft.Page):
         while not tetris.collision_check([tetris.right_condition, tetris.board_condition],col=1):
             await right(e)
 
+    def block_buttons(disable_direction_buttons=False, disable_function_buttons=False):
+        """A function to block buttons."""
+        start_btn.disabled = disable_function_buttons
+        start_btn.update()
+        restart_btn.disabled = disable_function_buttons
+        restart_btn.update()
+        rotate_btn.disabled = disable_direction_buttons
+        rotate_btn.update()
+        left_btn.disabled = disable_direction_buttons
+        left_btn.update()
+        right_btn.disabled = disable_direction_buttons
+        right_btn.update()
+        up_btn.disabled = disable_direction_buttons
+        up_btn.update()
+        down_btn.disabled = disable_direction_buttons
+        down_btn.update()
+
 
     async def settings(e):
         """A function to handle settings changes and update the main screen accordingly."""
         global main_screen_stack, main_screen
-        if not e.control.selected:
+        if not options_btn.selected:
+            # Stop game and disable Start and Restart buttons
+            start_btn.selected = False
+            block_buttons(disable_direction_buttons=True, disable_function_buttons=True)
+            await game(e)
+
             op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
             op.load_game_label.value = f"{OPTIONS_LABELS[3]}"
             if tetris.date:
@@ -270,9 +295,12 @@ async def main(page: ft.Page):
             main_screen.controls[0] = options
             main_screen.controls.pop() 
         else:
+            # Enable Start and Restart buttons
+            block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             main_screen.controls = main_screen_stack.copy()
-        e.control.selected = not e.control.selected
-        e.control.update()
+
+        options_btn.selected = not options_btn.selected
+        options_btn.update()
         page.update()
 
         
@@ -326,7 +354,7 @@ async def main(page: ft.Page):
     # Buttons
     options_btn = ft.IconButton(icon=ft.icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
 
-    start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"))
+    start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"), tooltip="Start / Pause")
     
     restart_btn = ft.IconButton(icon=ft.icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
     func_buttons = [start_btn, options_btn, restart_btn]
@@ -375,24 +403,26 @@ async def main(page: ft.Page):
     )
 
     async def keyboard(e: ft.KeyboardEvent):
-        if e.key == "Escape" or e.key == "Backspace":
-            await settings(e)
-        if e.key == "A" or e.key == "Arrow Left":
-            await left(e)
-        if e.key == "D" or e.key == "Arrow Right":
-            await right(e)
-        if e.key == "S" or e.key == "Arrow Down":
-            await down(e)
-        if e.key == "W" or e.key == "Arrow Up":
-            await drop(e)
-        if e.key == "F" or e.key == "Numpad 0":
-            await rotate(e)
-        if e.key == "R":
-            restart(e)
-        if e.key == "E" or e.key == "P":
-            start_btn.selected = not start_btn.selected
-            start_btn.update()
-            await game(e)
+        if not rotate_btn.disabled:
+            if e.key == "A" or e.key == "Arrow Left":
+                await left(e)
+            if e.key == "D" or e.key == "Arrow Right":
+                await right(e)
+            if e.key == "S" or e.key == "Arrow Down":
+                await down(e)
+            if e.key == "W" or e.key == "Arrow Up":
+                await drop(e)
+            if e.key == "F" or e.key == "Numpad 0":
+                await rotate(e)
+        if not start_btn.disabled:
+            if e.key == "Escape" or e.key == "Backspace":
+                await settings(e)
+            if e.key == "R":
+                restart(e)
+            if e.key == "E" or e.key == "P":
+                start_btn.selected = not start_btn.selected
+                start_btn.update()
+                await game(e)
 
     page.on_keyboard_event = keyboard
 
