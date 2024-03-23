@@ -152,21 +152,25 @@ async def main(page: ft.Page):
             next_tetromino_show_hide(True, tetris)
         
         # while game is running and not paused
-        while start_btn.selected:
-            block_buttons(disable_direction_buttons=False, disable_function_buttons=False)
+        while start_btn.selected and not options_btn.selected:
+            disable_buttons(disable_direction_buttons=False, disable_function_buttons=False)
             start_btn.label = ft.Text('Pause', color="black")
             start_btn.selected = True
             start_btn.update()
             await down_step(delay=tetris.delay)
 
             if tetris.status == 2: # if game is over
-                block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
+                disable_buttons(disable_direction_buttons=True, disable_function_buttons=False)
                 refresh_screen()
                 start_btn.selected = False
                 start_btn.label = ft.Text('Start', color="black")
                 start_btn.update()
                 tetris.status == 0
         else:
+            if options_btn.selected:
+                disable_buttons(disable_direction_buttons=True, disable_function_buttons=True)
+            else:
+                disable_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             start_btn.label = ft.Text('Start', color="black")
             game_over_label.value = "PAUSE" if tetris.status == 1 else "GAME OVER"
             page.update()
@@ -256,7 +260,7 @@ async def main(page: ft.Page):
         while not tetris.collision_check([tetris.right_condition, tetris.board_condition],col=1):
             await right(e)
 
-    def block_buttons(disable_direction_buttons=False, disable_function_buttons=False):
+    def disable_buttons(disable_direction_buttons=False, disable_function_buttons=False):
         """A function to block buttons."""
         start_btn.disabled = disable_function_buttons
         start_btn.update()
@@ -277,11 +281,14 @@ async def main(page: ft.Page):
     async def settings(e):
         """A function to handle settings changes and update the main screen accordingly."""
         global main_screen_stack, main_screen
-        if not options_btn.selected:
+        # print(options_btn.selected)
+        options_btn.selected = not options_btn.selected
+        options_btn.update()
+        if options_btn.selected:
             # Stop game and disable Start and Restart buttons
             start_btn.selected = False
-            block_buttons(disable_direction_buttons=True, disable_function_buttons=True)
-            await game(e)
+            start_btn.update()
+            disable_buttons(disable_direction_buttons=True, disable_function_buttons=True)
 
             op.reset_highscrore_label.value = f"{OPTIONS_LABELS[1]} {tetris.hiscore_rw}"
             op.load_game_label.value = f"{OPTIONS_LABELS[3]}"
@@ -295,11 +302,10 @@ async def main(page: ft.Page):
             main_screen.controls.pop() 
         else:
             # Enable Start and Restart buttons
-            block_buttons(disable_direction_buttons=True, disable_function_buttons=False)
+            disable_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             main_screen.controls = main_screen_stack.copy()
-
-        options_btn.selected = not options_btn.selected
-        options_btn.update()
+        
+        
         page.update()
 
         
