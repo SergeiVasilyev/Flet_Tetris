@@ -51,4 +51,5 @@ Left - 'A' or 'Arrow Left'
 Right - 'D' or 'Arrow Right'
 Up - 'W' or 'Arrow Up'
 Down - 'S' or 'Arrow Down'
+Rotate - 'F' or 'Numpad 0'
 ```
