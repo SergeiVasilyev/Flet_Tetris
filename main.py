@@ -254,6 +254,7 @@ async def main(page: ft.Page):
         """Moves the current tetromino to the left if button is held."""
         while not tetris.collision_check([tetris.left_condition, tetris.board_condition], col=-1):
             await left(e)
+            # await asyncio.sleep(0.1)
 
     async def right_long(e):
         """Moves the current tetromino to the right if button is held."""
@@ -364,12 +365,47 @@ async def main(page: ft.Page):
     restart_btn = ft.IconButton(icon=ft.icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
     func_buttons = [start_btn, options_btn, restart_btn]
 
+    is_direction_button_pressed = False
+
+
+
+    async def on_long_handler(e, fnc_handler):
+        nonlocal is_direction_button_pressed
+        while is_direction_button_pressed:
+            await fnc_handler(e)
+            await asyncio.sleep(0.1)
+
+    async def on_tap_handler(e):
+        nonlocal is_direction_button_pressed
+        is_direction_button_pressed = True
+        fnc_handler = e.control.data["direction"]
+
+        asyncio.create_task(on_long_handler(e, fnc_handler))
+
+
+
+    async def stop_holding(e):
+        nonlocal is_direction_button_pressed
+        is_direction_button_pressed = False
+
+
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
-    left_btn = ft.ElevatedButton("Left", on_click=left, on_long_press=left_long, style=direction_btn_style)
-    right_btn = ft.ElevatedButton("Right", on_click=right, on_long_press=right_long, style=direction_btn_style)
-    up_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
-    down_btn = ft.ElevatedButton("Down", on_click=down, on_long_press=down_long, style=direction_btn_style)
-    directions = [up_btn, left_btn, right_btn, down_btn, rotate_btn]
+
+    left_btn = ft.Container(content=ft.Text("Left", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=24, right=24), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+
+    right_btn = ft.Container(content=ft.Text("Right", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=20, right=20), bgcolor=BTN_COLOR, margin=ft.margin.only(left=0), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    
+    # up_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
+    up_btn = ft.Container(content=ft.Text("Up", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=27, right=27), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+
+    down_btn = ft.Container(content=ft.Text("Down", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=18, right=18), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    
+    left_btn_gesture = ft.GestureDetector(content=left_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": left})
+    right_btn_gesture = ft.GestureDetector(content=right_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": right})
+    down_btn_gesture = ft.GestureDetector(content=down_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": down})
+    up_btn_gesture = ft.GestureDetector(content=up_btn, on_tap=drop)
+    
+    directions = [up_btn_gesture, left_btn_gesture, right_btn_gesture, down_btn_gesture, rotate_btn]
 
     buttons_block = buttons_layout(func_buttons, directions)
 
