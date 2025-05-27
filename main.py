@@ -358,11 +358,11 @@ async def main(page: ft.Page):
     rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
 
     # Buttons
-    options_btn = ft.IconButton(icon=ft.icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
+    options_btn = ft.IconButton(icon=ft.Icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
 
     start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"), tooltip="Start / Pause")
     
-    restart_btn = ft.IconButton(icon=ft.icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
+    restart_btn = ft.IconButton(icon=ft.Icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
     func_buttons = [start_btn, options_btn, restart_btn]
 
     is_direction_button_pressed = False
@@ -391,14 +391,14 @@ async def main(page: ft.Page):
 
     rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
 
-    left_btn = ft.Container(content=ft.Text("Left", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=24, right=24), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    left_btn = ft.Container(content=ft.Text("Left", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=24, right=24), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
 
-    right_btn = ft.Container(content=ft.Text("Right", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=20, right=20), bgcolor=BTN_COLOR, margin=ft.margin.only(left=0), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    right_btn = ft.Container(content=ft.Text("Right", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=20, right=20), bgcolor=BTN_COLOR, margin=ft.margin.only(left=0), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
     
     # up_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
-    up_btn = ft.Container(content=ft.Text("Up", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=27, right=27), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    up_btn = ft.Container(content=ft.Text("Up", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=27, right=27), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
 
-    down_btn = ft.Container(content=ft.Text("Down", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=18, right=18), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.colors.YELLOW_600, ft.colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.colors.GREY_700, offset=ft.Offset(1, 1)))
+    down_btn = ft.Container(content=ft.Text("Down", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=18, right=18), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
     
     left_btn_gesture = ft.GestureDetector(content=left_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": left})
     right_btn_gesture = ft.GestureDetector(content=right_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": right})
@@ -430,10 +430,10 @@ async def main(page: ft.Page):
     main_screen_container = ft.Container(
         content=main_screen,
         border=ft.border.only(
-            bottom=ft.border.BorderSide(4, ft.colors.BLACK12), 
-            right=ft.border.BorderSide(4, ft.colors.BLACK12), 
-            left=ft.border.BorderSide(4, ft.colors.BLACK38), 
-            top=ft.border.BorderSide(4, ft.colors.BLACK38)),
+            bottom=ft.border.BorderSide(4, ft.Colors.BLACK12), 
+            right=ft.border.BorderSide(4, ft.Colors.BLACK12), 
+            left=ft.border.BorderSide(4, ft.Colors.BLACK38), 
+            top=ft.border.BorderSide(4, ft.Colors.BLACK38)),
         border_radius=20,
     )
 
@@ -471,8 +471,8 @@ async def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = PAGE_PADDING
-    page.window_height = WINDOW_HEIGHT
-    page.window_width = WINDOW_WIDTH
+    page.window.height = WINDOW_HEIGHT
+    page.window.width = WINDOW_WIDTH
     page.fonts = FONTS
     page.bgcolor = PAGE_BACKGROUND_COLOR
     page.add(tetris_row, buttons_block)
