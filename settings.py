@@ -16,13 +16,13 @@ BRIGHT_COLOR = ft.Colors.BLACK
 
 # Game init settings
 PAGE_PADDING = 5
-horizontal_offset = 4
+WRAP_PADDING_TOP = 50
 
 ROW_POSITION =- 1
 COL_POSITION = 4
 
 WINDOW_WIDTH = 500
-WINDOW_HEIGHT = 800
+WINDOW_HEIGHT = 850
 PAGE_BACKGROUND_COLOR = "#2980B9"
 FONTS = {"LCD": "fonts/LCD2N.TTF"}
 
@@ -37,4 +37,4 @@ OPTIONS_LABELS = ["ROTATE CLOCKWISE", "RESET HIGH SCORE", "SAVE GAME", "LOAD GAM
 HIGHSCORE_FILE = "highscore.json"
 GAME_STATE_FILE = "game_state.json"
 
-CREDITS_TEXT = "Version: 1.0.2alpha, \nAutor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/"
+CREDITS_TEXT = "Version: 1.0.3, \nAutor: Sergey Vasilev, 2024 \nGitHub: https://github.com/SergeiVasilyev/Flet_Tetris"

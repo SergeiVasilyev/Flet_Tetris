@@ -6,6 +6,11 @@ from main_screen import MainScreen
 from tetris import Game
 from options import Options
 from datetime import datetime
+from styles import *
+
+from pynput import keyboard
+import threading
+from queue import Queue
 
 
 # Game screen layout 
@@ -36,6 +41,14 @@ game_over_label = ft.Text("", size=15, color="black")
 
 
 async def main(page: ft.Page):
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.padding = ft.padding.only(top=PAGE_PADDING, bottom=0, left=0, right=0)
+    page.window.height = WINDOW_HEIGHT
+    page.window.width = WINDOW_WIDTH
+    page.fonts = FONTS
+    page.bgcolor = PAGE_BACKGROUND_COLOR
+    is_direction_button_pressed = False
       
 
     def refresh_screen(refresh=False) -> None:
@@ -152,7 +165,7 @@ async def main(page: ft.Page):
             next_tetromino_show_hide(True, tetris)
         
         # while game is running and not paused
-        while start_btn.selected and not options_btn.selected:
+        while start_btn.selected and not settings_btn.selected:
             disable_buttons(disable_direction_buttons=False, disable_function_buttons=False)
             start_btn.label = ft.Text('Pause', color="black")
             start_btn.selected = True
@@ -167,7 +180,7 @@ async def main(page: ft.Page):
                 start_btn.update()
                 tetris.status == 0
         else:
-            if options_btn.selected:
+            if settings_btn.selected:
                 disable_buttons(disable_direction_buttons=True, disable_function_buttons=True)
             else:
                 disable_buttons(disable_direction_buttons=True, disable_function_buttons=False)
@@ -176,7 +189,7 @@ async def main(page: ft.Page):
             page.update()
         
 
-    def restart(e):
+    async def restart(e):
         """
         Restarts the game by clearing the next tetromino field, initializing the tetris game, resetting the screen, and updating the next tetromino view.
         Parameters:
@@ -191,6 +204,9 @@ async def main(page: ft.Page):
 
     async def rotate(e):
         """Rotates tetromino and updates screen."""
+        if not start_btn.selected:
+            return
+        
         tetromino_show_hide(False, tetris)
         tetris.rotate()
         tetromino_show_hide(True, tetris)
@@ -199,6 +215,9 @@ async def main(page: ft.Page):
 
     async def left(e):
         """Moves tetromino to the left and updates screen."""
+        if not start_btn.selected:
+            return
+
         tetromino_show_hide(False, tetris)
         tetris.left()
         tetromino_show_hide(True, tetris)
@@ -207,6 +226,9 @@ async def main(page: ft.Page):
 
     async def right(e):
         """Moves tetromino to the right and updates screen."""
+        if not start_btn.selected:
+            return
+        
         tetromino_show_hide(False, tetris)
         tetris.right()
         tetromino_show_hide(True, tetris)
@@ -224,6 +246,9 @@ async def main(page: ft.Page):
  
     async def drop(e):
         """Drops the current tetromino."""
+        if not start_btn.selected:
+            return
+        
         tetromino_show_hide(False, tetris)
         while not tetris.current_tetromino.row < 0:
             tetris.down()
@@ -235,6 +260,9 @@ async def main(page: ft.Page):
 
     async def down(e):
         """Moves the current tetromino down."""
+        if not start_btn.selected:
+            return
+        
         await set_dropped_and_update()
         if not tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
             tetromino_show_hide(False, tetris)
@@ -243,49 +271,23 @@ async def main(page: ft.Page):
         main_screen.update()
 
 
-    async def down_long(e):
-        """Moves the current tetromino down if button is held."""
-        while not tetris.collision_check([tetris.bottom_condition, tetris.board_condition], row=1):
-            await asyncio.sleep(0)
-            await down(e)
-            
-
-    async def left_long(e):
-        """Moves the current tetromino to the left if button is held."""
-        while not tetris.collision_check([tetris.left_condition, tetris.board_condition], col=-1):
-            await left(e)
-            # await asyncio.sleep(0.1)
-
-    async def right_long(e):
-        """Moves the current tetromino to the right if button is held."""
-        while not tetris.collision_check([tetris.right_condition, tetris.board_condition],col=1):
-            await right(e)
-
     def disable_buttons(disable_direction_buttons=False, disable_function_buttons=False):
         """A function to block buttons."""
         start_btn.disabled = disable_function_buttons
-        start_btn.update()
         restart_btn.disabled = disable_function_buttons
-        restart_btn.update()
         rotate_btn.disabled = disable_direction_buttons
-        rotate_btn.update()
-        left_btn.disabled = disable_direction_buttons
-        left_btn.update()
-        right_btn.disabled = disable_direction_buttons
-        right_btn.update()
-        up_btn.disabled = disable_direction_buttons
-        up_btn.update()
-        down_btn.disabled = disable_direction_buttons
-        down_btn.update()
+        left_btn_gesture.disabled = disable_direction_buttons
+        right_btn_gesture.disabled = disable_direction_buttons
+        up_btn_gesture.disabled = disable_direction_buttons
+        down_btn_gesture.disabled = disable_direction_buttons
 
 
     async def settings(e):
         """A function to handle settings changes and update the main screen accordingly."""
         global main_screen_stack, main_screen
-        # print(options_btn.selected)
-        options_btn.selected = not options_btn.selected
-        options_btn.update()
-        if options_btn.selected:
+        settings_btn.selected = not settings_btn.selected
+        settings_btn.update()
+        if settings_btn.selected:
             # Stop game and disable Start and Restart buttons
             start_btn.selected = False
             start_btn.update()
@@ -305,7 +307,6 @@ async def main(page: ft.Page):
             # Enable Start and Restart buttons
             disable_buttons(disable_direction_buttons=True, disable_function_buttons=False)
             main_screen.controls = main_screen_stack.copy()
-        
         
         page.update()
 
@@ -345,69 +346,79 @@ async def main(page: ft.Page):
             tetris.rotate_direction = -1
 
 
+    # ---Long press handlers---
+    async def on_long_press_handler(e, fnc_handler):
+        """A long press handler to call the specified function every 70 ms.
+        
+        Args:
+            e: an event object
+            fnc_handler: a function to call on long press
+        """
+        nonlocal is_direction_button_pressed
+        while is_direction_button_pressed:
+            await fnc_handler(e)
+            await asyncio.sleep(0.07)
+
+
+    async def on_tap_handler(e):
+        """A tap handler to call the specified function on tap, and then start long press handling.
+        
+        Args:
+            e: an event object, where e.control.data["direction"] is the function to call
+        """
+        nonlocal is_direction_button_pressed
+        is_direction_button_pressed = True
+        fnc_handler = e.control.data["direction"]
+        await fnc_handler(e)
+        await asyncio.sleep(0.08)
+        asyncio.create_task(on_long_press_handler(e, fnc_handler))
+
+
+    async def stop_holding(e):
+        """Stops long press handling by setting is_direction_button_pressed to False."""
+        nonlocal is_direction_button_pressed
+        is_direction_button_pressed = False
+
+    # ---End of long press handlers---
+
+
+
+    # ---Buttons---
     # Option buttons.
     op.reset_highscrore.on_click = reset_highscrore
     op.save_game.on_click = save_game
     op.load_game.on_click = load_game
     op.clockwise.on_change = clockwise
     
-
-    # Buttons style
-    func_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=ft.padding.all(0), color="black", bgcolor="white", shadow_color="black", elevation=3)
-    direction_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=35, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
-    rotate_btn_style = ft.ButtonStyle(shape=ft.CircleBorder(), padding=60, bgcolor=BTN_COLOR, color="black", shadow_color="black", elevation=3)
-
-    # Buttons
-    options_btn = ft.IconButton(icon=ft.Icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
+    settings_btn = ft.IconButton(icon=ft.Icons.SETTINGS, icon_size=14, icon_color="black", bgcolor="white", on_click=settings, tooltip="Options", selected=False, width=30, height=30, style=func_btn_style)
 
     start_btn = ft.Chip(label=ft.Text('Start', color="black"), on_select=game, shape=ft.StadiumBorder(), elevation=3, shadow_color="black", bgcolor="white", label_style=ft.TextStyle(color="black"), tooltip="Start / Pause")
     
     restart_btn = ft.IconButton(icon=ft.Icons.REPLAY, icon_size=14, icon_color="black", bgcolor="white", on_click=restart, tooltip="Restart game", selected=False, width=30, height=30, style=func_btn_style)
-    func_buttons = [start_btn, options_btn, restart_btn]
+    func_buttons = [start_btn, settings_btn, restart_btn]
 
-    is_direction_button_pressed = False
+    rotate_btn = direction_btn_style("Rotate", width=110, height=110)
 
-
-
-    async def on_long_handler(e, fnc_handler):
-        nonlocal is_direction_button_pressed
-        while is_direction_button_pressed:
-            await fnc_handler(e)
-            await asyncio.sleep(0.1)
-
-    async def on_tap_handler(e):
-        nonlocal is_direction_button_pressed
-        is_direction_button_pressed = True
-        fnc_handler = e.control.data["direction"]
-
-        asyncio.create_task(on_long_handler(e, fnc_handler))
-
-
-
-    async def stop_holding(e):
-        nonlocal is_direction_button_pressed
-        is_direction_button_pressed = False
-
-
-    rotate_btn = ft.ElevatedButton("Rotate", on_click=rotate, style=rotate_btn_style)
-
-    left_btn = ft.Container(content=ft.Text("Left", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=24, right=24), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
-
-    right_btn = ft.Container(content=ft.Text("Right", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=20, right=20), bgcolor=BTN_COLOR, margin=ft.margin.only(left=0), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
+    left_btn = direction_btn_style("Left")
+    right_btn = direction_btn_style("Right")
+    up_btn = direction_btn_style("Drop")
+    down_btn = direction_btn_style("Down")
     
-    # up_btn = ft.ElevatedButton("Drop", on_click=drop, style=direction_btn_style)
-    up_btn = ft.Container(content=ft.Text("Up", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=27, right=27), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
+    def gesture_handler(content, data, on_tap_down=on_tap_handler):
+        return ft.GestureDetector(content=content, on_tap_down=on_tap_down, on_tap_up=stop_holding, on_pan_end=stop_holding, data=data)
 
-    down_btn = ft.Container(content=ft.Text("Down", color="black"), border_radius=50, padding=ft.Padding(top=25, bottom=25, left=18, right=18), bgcolor=BTN_COLOR, margin=ft.margin.only(left=10), gradient=ft.RadialGradient(colors=[ft.Colors.YELLOW_600, ft.Colors.YELLOW_800], radius=0.9), shadow=ft.BoxShadow(blur_radius=3, spread_radius=1, color=ft.Colors.GREY_700, offset=ft.Offset(1, 1)))
-    
-    left_btn_gesture = ft.GestureDetector(content=left_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": left})
-    right_btn_gesture = ft.GestureDetector(content=right_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": right})
-    down_btn_gesture = ft.GestureDetector(content=down_btn, on_tap_down=on_tap_handler, on_tap_up=stop_holding, on_pan_end=stop_holding, data={"direction": down})
+    rotate_btn_gesture = gesture_handler(rotate_btn, {}, on_tap_down=rotate)
+    left_btn_gesture = gesture_handler(left_btn, {"direction": left})
+    right_btn_gesture = gesture_handler(right_btn, {"direction": right})
+    down_btn_gesture = gesture_handler(down_btn, {"direction": down})
     up_btn_gesture = ft.GestureDetector(content=up_btn, on_tap=drop)
     
-    directions = [up_btn_gesture, left_btn_gesture, right_btn_gesture, down_btn_gesture, rotate_btn]
+    directions = [up_btn_gesture, left_btn_gesture, right_btn_gesture, down_btn_gesture, rotate_btn_gesture]
 
     buttons_block = buttons_layout(func_buttons, directions)
+
+    # ---End of buttons---
+
 
     # Dashboard
     info_container = ft.Container(
@@ -438,44 +449,97 @@ async def main(page: ft.Page):
     )
 
     # Main screen
-    tetris_row = ft.Row(
+    main_screen_wrap = ft.Row(
         [main_screen_container],
         alignment=ft.MainAxisAlignment.CENTER,
     )
 
-    async def keyboard(e: ft.KeyboardEvent):
-        if not rotate_btn.disabled:
-            if e.key == "A" or e.key == "Arrow Left":
-                await left(e)
-            if e.key == "D" or e.key == "Arrow Right":
-                await right(e)
-            if e.key == "S" or e.key == "Arrow Down":
-                await down(e)
-            if e.key == "W" or e.key == "Arrow Up":
-                await drop(e)
-            if e.key == "F" or e.key == "Numpad 0":
-                await rotate(e)
-        if not start_btn.disabled:
-            if e.key == "Escape" or e.key == "Backspace":
+    # Keyboard events for handle functional buttons
+    async def flet_keyboard(e: ft.KeyboardEvent):
+        if e.key == "Escape" or e.key == "Backspace":
                 await settings(e)
+        if not start_btn.disabled:
             if e.key == "R":
-                restart(e)
+                await restart(e)
             if e.key == "E" or e.key == "P":
                 start_btn.selected = not start_btn.selected
                 start_btn.update()
                 await game(e)
 
-    page.on_keyboard_event = keyboard
+    
 
-    # Page view settings
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.padding = PAGE_PADDING
-    page.window.height = WINDOW_HEIGHT
-    page.window.width = WINDOW_WIDTH
-    page.fonts = FONTS
-    page.bgcolor = PAGE_BACKGROUND_COLOR
-    page.add(tetris_row, buttons_block)
+    page.on_keyboard_event = flet_keyboard
+
+    wrap = ft.Container(
+        content=ft.Column([main_screen_wrap, buttons_block]),
+        gradient=ft.RadialGradient(colors=["#478FBF", "#2980B9"], radius=1), 
+        expand=True,
+        padding=ft.padding.only(left=0, right=0, top=WRAP_PADDING_TOP, bottom=0)
+        )
+    page.add(wrap)
+    page.update() 
+
+
+
+    # --- Keyboard events for handle direction keys (pynput) ---
+    # It uses queue to store events amd handle holding keys
+    # The use of pynput library is due to the fact that Flet does not support following the pressing and releasing of keyboard buttons.
+
+    def on_press(key):
+        try:
+            if start_btn.selected:
+                if key == keyboard.Key.down or key == keyboard.KeyCode(char='s'):
+                    key_events.put({"handler": down})
+                elif key == keyboard.Key.up or key == keyboard.KeyCode(char='w'):
+                    key_events.put({"handler": drop})
+                elif key == keyboard.Key.left or key == keyboard.KeyCode(char='a'):
+                    key_events.put({"handler": left})
+                elif key == keyboard.Key.right or key == keyboard.KeyCode(char='d'):
+                    key_events.put({"handler": right})
+                elif key == keyboard.Key.ctrl_r or key == keyboard.KeyCode(char='f'):
+                    key_events.put({"handler": rotate})
+        except Exception as e:
+            print("Keyboard event error", e)
+
+
+    # Keyboard listener thread 
+    def start_listener():
+        """
+        A function to start a keyboard listener thread to capture keyboard events.
+
+        The function uses the pynput library to listen for keyboard events and
+        invokes the associated event handler functions when a key is pressed.
+
+        The function starts the listener in a separate thread and waits for it to finish.
+        """
+        with keyboard.Listener(on_press=on_press) as listener:
+            listener.join()
+
+
+    # Events handler
+    async def process_events():
+        """
+        An asynchronous function to continuously process keyboard events from the event queue.
+        It retrieves events from the queue, executes the associated handler asynchronously,
+        and sleeps for a short duration to prevent excessive CPU usage.
+        """
+
+        while True:
+            if not key_events.empty():
+                event = key_events.get()
+                fnc = event.get("handler")
+                await fnc(None)
+            await asyncio.sleep(0.01)
+
+
+    # Run keyboard listener, Run events handler
+    platform = ["windows", "macos", "linux"]
+    if page.platform.value in platform:
+        key_events = Queue()
+        threading.Thread(target=start_listener, daemon=True).start()
+        asyncio.create_task(process_events())
+
+    # --- End of keyboard events ---
 
 ft.app(target=main)
 
