@@ -8,39 +8,35 @@ from options import Options
 from datetime import datetime
 from styles import *
 
-from pynput import keyboard
-import threading
-from queue import Queue
-
-
-# Game screen layout 
-ms = MainScreen()
-main_screen = ms.background()
-main_screen_stack = main_screen.controls.copy()
-next_viewer = ms.next_tetromino_viewer()
-main_container = main_screen.controls[0].content
-
-# Game initialization
-tetris = Game()
-op = Options()
-options = op.options_fn(ms.main_cont_width+150, ms.main_cont_height)
-# options_hiscore = options.content.controls[0].controls[2].content.controls[0].value
-
-# Initialization dashboard elements
-lcd_font = "LCD"
-hiscore_label = ft.Text(f"HI-SCORE", size=15, color="black")
-hiscore = ft.Text(f"{tetris.hiscore_rw}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
-score_lable = ft.Text(f"SCORE", size=15, color="black")
-score = ft.Text(f"0", size=20, color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
-level_lable = ft.Text(f"LEVEL", size=15, color="black")
-level = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
-speed_lable = ft.Text(f"SPEED", size=15, color="black")
-speed = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
-next_label = ft.Text(f"NEXT", size=15, color="black")
-game_over_label = ft.Text("", size=15, color="black")
 
 
 async def main(page: ft.Page):
+    # Game screen layout 
+    ms = MainScreen()
+    main_screen = ms.background()
+    main_screen_stack = main_screen.controls.copy()
+    next_viewer = ms.next_tetromino_viewer()
+    main_container = main_screen.controls[0].content
+
+    # Game initialization
+    tetris = Game()
+    op = Options()
+    options = op.options_fn(ms.main_cont_width+150, ms.main_cont_height)
+
+    # Initialization dashboard elements
+    lcd_font = "LCD"
+    hiscore_label = ft.Text(f"HI-SCORE", size=15, color="black")
+    hiscore = ft.Text(f"{tetris.hiscore_rw}", size=20,  color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+    score_lable = ft.Text(f"SCORE", size=15, color="black")
+    score = ft.Text(f"0", size=20, color="black", font_family=lcd_font, text_align=ft.TextAlign.CENTER)
+    level_lable = ft.Text(f"LEVEL", size=15, color="black")
+    level = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
+    speed_lable = ft.Text(f"SPEED", size=15, color="black")
+    speed = ft.Text(f"1", size=20, color="black", font_family=lcd_font)
+    next_label = ft.Text(f"NEXT", size=15, color="black")
+    game_over_label = ft.Text("", size=15, color="black")
+
+    # Page settings
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.padding = ft.padding.only(top=PAGE_PADDING, bottom=0, left=0, right=0)
@@ -99,7 +95,6 @@ async def main(page: ft.Page):
 
     def update_dashboard():
         """Update the dashboard with the current game statistics including lines, level, score, delay, and speed."""
-        global level, score, hiscore_label, hiscore
         hiscore.value = f"{tetris.hiscore_rw}"
         level.value = f"{tetris.level}"
         score.value = f"{tetris.score}"
@@ -284,7 +279,7 @@ async def main(page: ft.Page):
 
     async def settings(e):
         """A function to handle settings changes and update the main screen accordingly."""
-        global main_screen_stack, main_screen
+        nonlocal main_screen_stack
         settings_btn.selected = not settings_btn.selected
         settings_btn.update()
         if settings_btn.selected:
@@ -535,6 +530,13 @@ async def main(page: ft.Page):
     # Run keyboard listener, Run events handler
     platform = ["windows", "macos", "linux"]
     if page.platform.value in platform:
+        try:
+            from pynput import keyboard
+            import threading
+            from queue import Queue
+        except Exception as e:
+            print("Keyboard event error", e)
+
         key_events = Queue()
         threading.Thread(target=start_listener, daemon=True).start()
         asyncio.create_task(process_events())
