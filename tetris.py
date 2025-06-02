@@ -1,6 +1,6 @@
 from datetime import datetime
 import random
-from tetrominoes import TETROMINOES, EL_T, EL_L, EL_J, EL_O, EL_I, EL_S, EL_Z
+from tetrominoes import TETROMINOES
 from settings import *
 from data_rw import load_data, save_data
 
