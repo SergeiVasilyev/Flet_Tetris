@@ -3,7 +3,7 @@ from settings import *
 
 
 
-def direction_btn_style(text: str, margin_left=0, width=75, height=75):
+def direction_btn_style(text: str, margin_left=0, width=85, height=85, border_radius=50):
     """Generate a style for a button with a specified text and size. The default width and height are 75.
     
     Args:
@@ -16,7 +16,7 @@ def direction_btn_style(text: str, margin_left=0, width=75, height=75):
         ft.Container: The container with the specified style.
     """
     return ft.Container(content=ft.Text(text, color="black", text_align="center"), 
-                        border_radius=50, 
+                        border_radius=border_radius, 
                         width=width, 
                         height=height, 
                         alignment=ft.alignment.center,
