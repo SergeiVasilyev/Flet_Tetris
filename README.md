@@ -2,7 +2,7 @@
 
 My implementation of the console game Tetris from the 90s using the cross-platform Flet framework
 
-Python version ```3.10.9```
+Python version ```3.13.1```
 
 Flet version ```0.28.3```
 
