@@ -1,7 +1,7 @@
 import asyncio
 import flet as ft
 from datetime import datetime
-from typing import Optional, Callable, Dict, List
+from typing import Optional
 
 from settings import *
 from buttons_layout import buttons_layout
@@ -10,6 +10,8 @@ from tetris import Game
 from options import Options
 from styles import *
 
+# Import pynput if available 
+# For android compatibility wrap in try/except
 try:
     from pynput import keyboard
     import threading
@@ -148,7 +150,7 @@ class TetrisApp:
         )
         
         # Direction buttons
-        self.rotate_btn = direction_btn_style("Rotate", width=110, height=110)
+        self.rotate_btn = direction_btn_style("Rotate", width=135, height=135, border_radius=70)
         self.left_btn = direction_btn_style("Left")
         self.right_btn = direction_btn_style("Right")
         self.up_btn = direction_btn_style("Drop")
@@ -336,7 +338,7 @@ class TetrisApp:
         self.tetris.inits()
         self.refresh_screen(True)
         await self.next_tetromino_show_hide(True)
-        self.page.update()
+        self.main_container.update()
 
 
     async def rotate(self, e):
@@ -347,7 +349,8 @@ class TetrisApp:
         await self.tetromino_show_hide(False)
         self.tetris.rotate()
         await self.tetromino_show_hide(True)
-        self.page.update()
+        self.main_container.update()
+
 
     async def left(self, e):
         """Moves tetromino to the left and updates screen."""
@@ -357,7 +360,7 @@ class TetrisApp:
         await self.tetromino_show_hide(False)
         self.tetris.left()
         await self.tetromino_show_hide(True)
-        self.page.update()
+        self.main_container.update()
 
 
     async def right(self, e):
@@ -368,7 +371,7 @@ class TetrisApp:
         await self.tetromino_show_hide(False)
         self.tetris.right()
         await self.tetromino_show_hide(True)
-        self.page.update()
+        self.main_container.update()
 
 
     async def down_step(self, delay):
@@ -379,7 +382,7 @@ class TetrisApp:
         await self.down(None)
         await asyncio.sleep(delay) # Main delay
 
-    async def drop(self,e):
+    async def drop(self, e):
         """Drops the current tetromino."""
         if not self.start_btn.selected:
             return
