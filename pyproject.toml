@@ -3,7 +3,7 @@ name = "Flet-Tetris"
 version = "1.0.3"
 description = ""
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13.1"
 authors = [
     { name = "Serge Vasilyev", email = "sergey.vasilyev.dev@gmail.com" }
 ]
@@ -11,16 +11,21 @@ dependencies = [
   "flet==0.28.3"
 ]
 
-[project.optional-dependencies]
-desktop = [
-    "pynput>=1.8.1",
-]
-
 [tool.flet]
-org = "com.sergevasilyev"
+org = "com.fletgames"
 product = "Flet-Tetris"
-company = "Sergey Vasilyev"
+company = ""
 copyright = "Copyright (C) 2025 by Sergey Vasilyev"
+build_number = 1
 
 [tool.flet.app]
 path = ""
+
+[tool.flet.app.boot_screen]
+show = true
+message = "Preparing the Tetris game for its first launch…"
+
+
+[tool.flet.app.startup_screen]
+show = true
+message = "Launching the Tetris game…"
